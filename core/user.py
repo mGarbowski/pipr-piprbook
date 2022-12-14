@@ -1,9 +1,14 @@
+from dataclasses import dataclass, field
+from typing import Optional
+
+
+@dataclass
 class User:
-    id: str
+    user_id: str
     username: str
     email: str
-    bio: str
-    profile_picture_id: str
-    friends: list['User']
     password_hash: str
     salt: str
+    friends: list['User'] = field(default_factory=list)
+    profile_picture_id: Optional[str] = None
+    bio: Optional[str] = None
