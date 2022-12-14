@@ -1,0 +1,9 @@
+class User:
+    id: str
+    username: str
+    email: str
+    bio: str
+    profile_picture_id: str
+    friends: list['User']
+    password_hash: str
+    salt: str
