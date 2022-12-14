@@ -5,7 +5,7 @@
 Zarządza uwierzytelnianiem
 
 Porównuje dane podane przez użytkownika przy logowaniu z danymi z UserRepository
-Przechowuje stan - informacje o aktualnie zalogowanym użytkowniku
+Przechowuje stan - informacje o aktualnie zalogowanym użytkowniku.
 
 ### Zależy od
 * UserRepository

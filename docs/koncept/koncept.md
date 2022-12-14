@@ -1,41 +1,42 @@
 # Koncept
-Interfejs użytkownika graficzny / tekstowy?
+Interfejs użytkownika graficzny / tekstowy
+
+Aplikacja podzielona na warstwy
+* Główna logika
+* Warstwa utrwalania (komunikacja z bazą danych)
+* Interfejs użytkownika
 
 Warstwa utrwalania zrealizowana przez zapisywanie / odczytywanie plików JSON.
 Wszystkie będą wyglądać podobnie, może dałoby się stworzyć jakieś generyczne Repository.
 
 Application spina główną funkcjonalność z interfejsem użytkownika
 
-Zdjęcia przekazywane przez nazwę pliku (CLI) i przechowywane w folderze.
-Nie mam pomysłu jak to zrealizować nie ograniczając się tylko do systemu plików,
-tak żeby zachować np możliwość trzymania ich w bazie danych.
+Zdjęcia przechowywane w folderze
 
-Porządne logowanie, bez przechowywania w jawny sposób hasła
+Bezpieczne logowanie, bez przechowywania w jawny sposób hasła
 
-Na niektóre rzeczy (Serializer) na pewno nie potrzeba oddzielnych klas (naleciałość z Javy)
-
-* Klasy User, Message, FriendRequest tylko przechowują informacje
+* Klasy modelowe User, Message, FriendRequest tylko przechowują informacje
 * Klasy typu Service modyfikują / dodają nowych użytkowników / wiadomości / zaproszenia
 * Klasy typu Repository utrwalają obiekty domenowe
 * Klasy typu FilesystemRepository implementują interfejs Repository i utrwalają obiekty w plikach JSON
-* Klasy typu Serializer tłumaczą obiekty dmoenowe na słowniki (JSON) i na odwrót
+* Klasy typu Serializer tłumaczą obiekty modelowe na słowniki (JSON) i na odwrót
 
 ## Klasy / moduły
 * Application
-* Authentication
-* User
+* [Authentication](authentication.md)
+* [User](user.md)
   * UserService
   * UserSerializer
   * UserRepository (Protocol)
     * FilesystemUserRepository
     * SqliteUserRepository?
   * FilesystemPhotoRepository
-* Message
+* [Message](message.md)
   * MessageSerializer
   * MessageRepository (Protocol)
     * FilesystemMessageRepository 
     * SqliteMessageRepository?
-* FriendRequest
+* [FriendRequest](friend-request.md)
   * FriendRequestRepository (Protocol)
     * FilesystemFriendRequestRepository
     * SqliteFriendRequestReposiotry?
