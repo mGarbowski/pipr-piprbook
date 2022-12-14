@@ -1,6 +1,7 @@
 # PIPRbook
 Projekt semestralny
 
+[Pomysł na realizację](docs/koncept/koncept.md)
 
 ## Polecenie
 Proszę zaimplementować symulator prostego serwisu społecznościowego. 
