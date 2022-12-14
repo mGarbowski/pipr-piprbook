@@ -11,7 +11,7 @@ class User:
     email: str
     password_hash: str
     salt: str
-    friends: list['User'] = field(default_factory=list)
+    friend_uuids: list[str] = field(default_factory=list)
     profile_picture_id: Optional[str] = None
     bio: Optional[str] = None
 
