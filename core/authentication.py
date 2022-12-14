@@ -13,6 +13,7 @@ class Authentication:
     Handles logging in and out.
     Compares user credentials with those stored in UserRepository.
     """
+
     def __init__(self, user_repository: UserRepository):
         """Create a new Authentication object, initially no user is logged in
 
@@ -70,6 +71,7 @@ def hash_password(password: str, salt: str) -> str:
 
 class UserDoesNotExistError(Exception):
     """Exception signaling that there is no user with given login/username"""
+
     def __init__(self, username):
         super().__init__(f"User: {username} does not exist")
         self.username = username
@@ -77,5 +79,6 @@ class UserDoesNotExistError(Exception):
 
 class IncorrectPasswordError(Exception):
     """Exception singaling that given password is incorrect"""
+
     def __init__(self):
         super().__init__("Incorrect password")
