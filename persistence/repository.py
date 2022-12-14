@@ -1,8 +1,6 @@
 from typing import Protocol, TypeVar, Optional
 
-from core.firend_request import FriendRequest
-from core.message import Message
-from core.user import User
+from core.model import User, Message, FriendRequest
 
 T = TypeVar("T")
 
