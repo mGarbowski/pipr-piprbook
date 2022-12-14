@@ -7,11 +7,8 @@ Aplikacja podzielona na warstwy
 * Interfejs użytkownika
 
 Warstwa utrwalania zrealizowana przez zapisywanie / odczytywanie plików JSON.
-Wszystkie będą wyglądać podobnie, może dałoby się stworzyć jakieś generyczne Repository.
 
-Application spina główną funkcjonalność z interfejsem użytkownika
-
-Zdjęcia przechowywane w folderze
+Klasa Application spina główną funkcjonalność z interfejsem użytkownika
 
 Bezpieczne logowanie, bez przechowywania w jawny sposób hasła
 
