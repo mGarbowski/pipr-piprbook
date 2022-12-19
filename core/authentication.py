@@ -22,6 +22,7 @@ class Authentication:
         self.__user_repository = user_repository
         self.__logged_in_user: Optional[User] = None
 
+    # TODO: secure aggainst timing attack
     def log_in(self, login: str, password: str) -> None:
         """Attempt to log in with given credentials
 
@@ -82,3 +83,7 @@ class IncorrectPasswordError(Exception):
 
     def __init__(self):
         super().__init__("Incorrect password")
+
+
+class UnauthorizedError(Exception):
+    pass
