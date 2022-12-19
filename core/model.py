@@ -1,7 +1,11 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 
-from typing import Optional
+from typing import Optional, Protocol
+
+
+class Entity(Protocol):
+    uuid: str
 
 
 @dataclass
