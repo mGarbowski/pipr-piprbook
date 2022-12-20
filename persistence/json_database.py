@@ -3,9 +3,9 @@ from typing import TextIO, Optional, Type, TypeVar
 
 from core.model import JsonSerializable
 
-SerializedCollection = dict[str, dict]
 T = TypeVar("T", bound=JsonSerializable)
 Collection = dict[str, T]
+SerializedCollection = dict[str, dict]
 
 
 class JsonDatabase:
