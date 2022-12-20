@@ -1,10 +1,12 @@
 import json
-from typing import TextIO, Optional
+from typing import TextIO, Optional, Type, TypeVar
 
 from core.model import JsonSerializable
 
+# TODO: fix issues with type hints
 SerializedCollection = dict[str, dict]
-Collection = dict[str, JsonSerializable]
+T = TypeVar("T", bound=JsonSerializable)
+Collection = dict[str, T]
 
 
 class JsonDatabase:
@@ -32,7 +34,7 @@ class JsonDatabase:
         self.__db_file = db_file
         self.__collection_name_mapping = collection_name_mapping
 
-    def get_item(self, item_id: str, item_type: type[JsonSerializable]) -> Optional[JsonSerializable]:
+    def get_item(self, item_id: str, item_type: Type[T]) -> Optional[T]:
         """Get an entity by its id or None if not found
 
         :param item_id: id of entity
@@ -45,13 +47,34 @@ class JsonDatabase:
         item_json = collection[item_id]
         return item_type.from_json(item_json)
 
-    def save_item(self, item: JsonSerializable) -> None:
+    def save_item(self, item: T) -> None:
         """Save an entity to the database, overwriting previous value if it existed"""
         collection_type = type(item)
         collection_name = self._collection_name(collection_type)
         collection = self._get_serialized_collection(collection_type)
         collection[item.uuid] = item.to_json()
         self._save_serialized_collection(collection, collection_name)
+
+    def delete_item(self, item: T) -> None:
+        """Delete given entity from the database
+
+        If entity is not saved in the database - do nothing
+        """
+        item_type = type(item)
+        self.delete_item_by_id(item.uuid, item_type)
+
+    def delete_item_by_id(self, item_id: str, item_type: type) -> None:
+        """Delete an existing entity from the database by its id
+
+        If entity is not saved in the database - do nothing
+        """
+        collection = self._get_serialized_collection(item_type)
+        try:
+            collection.pop(item_id)
+            collection_name = self._collection_name(item_type)
+            self._save_serialized_collection(collection, collection_name)
+        except KeyError:
+            pass
 
     def get_collection(self, collection_type: type[JsonSerializable]) -> Collection:
         """Get collection of entities by their type"""
@@ -102,10 +125,14 @@ class JsonDatabase:
 
     def _load_all_collections(self) -> dict[str, SerializedCollection]:
         """Load database from file"""
-        return json.load(self.__db_file)
+        self.__db_file.seek(0)  # Go to the first byte before reading
+        data = json.load(self.__db_file)
+        return data
 
     def _save_all_collections(self, collections: dict[str, SerializedCollection]) -> None:
         """Save database to the file"""
+        self.__db_file.seek(0)  # Go to the first byte before reading
+        self.__db_file.truncate(0)  # Delete file content
         json.dump(collections, self.__db_file)
 
     @staticmethod
