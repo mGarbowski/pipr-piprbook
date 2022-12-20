@@ -8,7 +8,7 @@ class Entity(Protocol):
     uuid: str
 
 
-class JsonSerializable(Entity):
+class JsonSerializable(Entity, Protocol):
     def to_json(self) -> dict:
         ...
 

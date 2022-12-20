@@ -3,7 +3,6 @@ from typing import TextIO, Optional, Type, TypeVar
 
 from core.model import JsonSerializable
 
-# TODO: fix issues with type hints
 SerializedCollection = dict[str, dict]
 T = TypeVar("T", bound=JsonSerializable)
 Collection = dict[str, T]
@@ -63,7 +62,7 @@ class JsonDatabase:
         item_type = type(item)
         self.delete_item_by_id(item.uuid, item_type)
 
-    def delete_item_by_id(self, item_id: str, item_type: type) -> None:
+    def delete_item_by_id(self, item_id: str, item_type: type[T]) -> None:
         """Delete an existing entity from the database by its id
 
         If entity is not saved in the database - do nothing
@@ -76,7 +75,7 @@ class JsonDatabase:
         except KeyError:
             pass
 
-    def get_collection(self, collection_type: type[JsonSerializable]) -> Collection:
+    def get_collection(self, collection_type: type[T]) -> Collection:
         """Get collection of entities by their type"""
         serialized_collection = self._get_serialized_collection(collection_type)
         return _deserialize_collection(serialized_collection, collection_type)
@@ -97,7 +96,7 @@ class JsonDatabase:
         if collection and collection_type is not None:
             raise ValueError("Collection type can only be specified for empty collections")
 
-        collection_type = _infer_collection_type(collection) if collection else collection_type
+        collection_type = _infer_collection_type(collection) if collection_type is None else collection_type
         name = self._collection_name(collection_type)
 
         serialized_collection = _serialize_collection(collection)
