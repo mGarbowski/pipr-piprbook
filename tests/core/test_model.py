@@ -1,16 +1,8 @@
 from datetime import datetime
 
-from pytest import raises
+from _pytest.python_api import raises
 
-from core.model import User, Message, FriendRequest
-from core.serializers import (
-    user_to_json,
-    user_from_json,
-    message_to_json,
-    message_from_json,
-    friend_request_to_json,
-    friend_request_from_json, RepresentationError
-)
+from core.model import User, Message, FriendRequest, RepresentationError
 
 
 class TestUserSerialization:
@@ -31,7 +23,7 @@ class TestUserSerialization:
             bio="This is my bio"
         )
 
-        user_json = user_to_json(user)
+        user_json = user.to_json()
         assert user_json == {
             "uuid": "c1a40f26-7ba9-11ed-9382-00155df7f899",
             "username": "username",
@@ -56,7 +48,7 @@ class TestUserSerialization:
             salt="abc"
         )
 
-        user_json = user_to_json(user)
+        user_json = user.to_json()
         assert user_json == {
             "uuid": "c1a40f26-7ba9-11ed-9382-00155df7f899",
             "username": "username",
@@ -84,7 +76,7 @@ class TestUserSerialization:
             "bio": "This is my bio"
         }
 
-        parsed_user = user_from_json(user_json)
+        parsed_user = User.from_json(user_json)
         assert parsed_user == User(
             uuid="c1a40f26-7ba9-11ed-9382-00155df7f899",
             username="username",
@@ -111,7 +103,7 @@ class TestUserSerialization:
             "profile_picture_id": None,
             "bio": None
         }
-        parsed_user = user_from_json(user_json)
+        parsed_user = User.from_json(user_json)
         assert parsed_user == User(
             uuid="c1a40f26-7ba9-11ed-9382-00155df7f899",
             username="username",
@@ -122,7 +114,7 @@ class TestUserSerialization:
 
     def test_invalid_representation(self):
         with raises(RepresentationError):
-            user_from_json({
+            User.from_json({
                 "asdfasf": 12312313,
                 "adfhaslf": "adfnkaslf",
                 "sagnfamf": []
@@ -139,7 +131,7 @@ class TestMessageSerialization:
             from_user_id="e5539894-7bac-11ed-92f8-00155df7f899",
             to_user_id="f308c144-7bac-11ed-92f8-00155df7f899"
         )
-        message_json = message_to_json(message)
+        message_json = message.to_json()
         assert message_json == {
             "uuid": "926b72f0-7bac-11ed-92f8-00155df7f899",
             "text": "Est deserunt commodi totam adipisci beatae. Enim ut impedit aut.",
@@ -156,7 +148,7 @@ class TestMessageSerialization:
             "from_user_id": "e5539894-7bac-11ed-92f8-00155df7f899",
             "to_user_id": "f308c144-7bac-11ed-92f8-00155df7f899"
         }
-        parsed_message = message_from_json(message_json)
+        parsed_message = Message.from_json(message_json)
         assert parsed_message == Message(
             uuid="926b72f0-7bac-11ed-92f8-00155df7f899",
             text="Est deserunt commodi totam adipisci beatae. Enim ut impedit aut.",
@@ -167,7 +159,7 @@ class TestMessageSerialization:
 
     def test_invalid_representation(self):
         with raises(RepresentationError):
-            message_from_json({
+            Message.from_json({
                 "asdfasf": 12312313,
                 "adfhaslf": "adfnkaslf",
                 "sagnfamf": []
@@ -183,7 +175,7 @@ class TestFriendRequestSerialization:
             from_user_id="e5539894-7bac-11ed-92f8-00155df7f899",
             to_user_id="f308c144-7bac-11ed-92f8-00155df7f899"
         )
-        request_json = friend_request_to_json(request)
+        request_json = request.to_json()
         assert request_json == {
             "uuid": "926b72f0-7bac-11ed-92f8-00155df7f899",
             "timestamp": "2022-12-14T13:41:37",
@@ -198,7 +190,7 @@ class TestFriendRequestSerialization:
             "from_user_id": "e5539894-7bac-11ed-92f8-00155df7f899",
             "to_user_id": "f308c144-7bac-11ed-92f8-00155df7f899"
         }
-        parsed_request = friend_request_from_json(request_json)
+        parsed_request = FriendRequest.from_json(request_json)
         assert parsed_request == FriendRequest(
             uuid="926b72f0-7bac-11ed-92f8-00155df7f899",
             timestamp=datetime(2022, 12, 14, 13, 41, 37),
@@ -208,7 +200,7 @@ class TestFriendRequestSerialization:
 
     def test_invalid_representation(self):
         with raises(RepresentationError):
-            friend_request_from_json({
+            FriendRequest.from_json({
                 "asdfasf": 12312313,
                 "adfhaslf": "adfnkaslf",
                 "sagnfamf": []
