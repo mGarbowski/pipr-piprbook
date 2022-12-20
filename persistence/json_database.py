@@ -1,16 +1,10 @@
 import json
 from typing import TextIO, Optional
 
-from core.model import User, Message, FriendRequest, JsonSerializable
+from core.model import JsonSerializable
 
 SerializedCollection = dict[str, dict]
 Collection = dict[str, JsonSerializable]
-
-COLLECTION_NAMES_MAPPING: dict[type, str] = {
-    User: "users",
-    Message: "messages",
-    FriendRequest: "friend_requests",
-}
 
 
 class JsonDatabase:
@@ -128,16 +122,16 @@ class JsonDatabase:
         :raises InvalidDatabaseFileError: if given file is not valid
         """
         if not db_file.readable() or not db_file.writable():
-            raise InvalidDatabaseFileError()
+            raise InvalidDatabaseFileError("File must be readable and writable")
 
         try:
             file_data = json.load(db_file)
             collection_names = set(collection_name_mapping.values())
             file_keys = set(file_data.keys())
             if not collection_names.issubset(file_keys):
-                raise InvalidDatabaseFileError()
+                raise InvalidDatabaseFileError("JSON must contain all specified collections")
         except Exception as e:
-            raise InvalidDatabaseFileError() from e
+            raise InvalidDatabaseFileError("File must be in JSON format") from e
 
 
 def _infer_collection_type(collection: Collection) -> type:
@@ -167,4 +161,5 @@ def _deserialize_collection(
 
 
 class InvalidDatabaseFileError(ValueError):
+    """Error Signaling that a JSON file is not a valid representation of a database"""
     pass
