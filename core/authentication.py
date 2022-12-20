@@ -3,7 +3,7 @@ from hashlib import sha256
 from typing import Optional
 
 from core.model import User
-from persistence.repository import UserRepository
+from persistence.interface import UserRepository
 
 
 class Authentication:

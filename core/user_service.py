@@ -4,7 +4,7 @@ from typing import Optional
 from core.authentication import Authentication, UnauthorizedError
 from core.common import generate_uuid
 from core.model import FriendRequest, Message, User
-from persistence.repository import (
+from persistence.interface import (
     FriendRequestRepository, MessageRepository, PhotoRepository, UserRepository
 )
 
