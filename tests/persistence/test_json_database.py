@@ -6,6 +6,7 @@ from typing import TextIO
 from pytest import fixture, mark, raises
 
 from core.model import User, Message, FriendRequest
+from core.serializers import UserSerializer, MessageSerializer, FriendRequestSerializer
 from persistence.json_database import JsonDatabase, InvalidDatabaseFileError
 
 
@@ -84,22 +85,32 @@ def empty_database_file() -> TextIO:
 
 
 @fixture
-def empty_database(empty_database_file, collection_name_mapping):
-    return JsonDatabase(empty_database_file, collection_name_mapping)
+def serializers():
+    # TODO: Mock
+    return {
+        User: UserSerializer(),
+        Message: MessageSerializer(),
+        FriendRequest: FriendRequestSerializer()
+    }
+
+
+@fixture
+def empty_database(empty_database_file, collection_name_mapping, serializers):
+    return JsonDatabase(empty_database_file, collection_name_mapping, serializers)
 
 
 class TestJsonDatabase:
 
-    def test_create_database_incomplete_collections(self, collection_name_mapping):
+    def test_create_database_incomplete_collections(self, collection_name_mapping, serializers):
         incomplete_file = StringIO('{"messages": {},"friend_requests": {}}')
 
         with raises(InvalidDatabaseFileError):
-            JsonDatabase(incomplete_file, collection_name_mapping)
+            JsonDatabase(incomplete_file, collection_name_mapping, serializers)
 
-    def test_create_database_not_a_json_file(self, collection_name_mapping):
+    def test_create_database_not_a_json_file(self, collection_name_mapping, serializers):
         not_a_json = StringIO("<h1>This is not a json file</h1>")
         with raises(InvalidDatabaseFileError):
-            JsonDatabase(not_a_json, collection_name_mapping)
+            JsonDatabase(not_a_json, collection_name_mapping, serializers)
 
     def test_save_and_get_from_initially_empty_database(self, empty_database, user_1):
         empty_database.save_item(user_1)

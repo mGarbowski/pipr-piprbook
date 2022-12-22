@@ -1,20 +1,9 @@
 from datetime import datetime
-from typing import Protocol, TypeVar
+from typing import TypeVar
 
 from core.model import User, Message, FriendRequest
 
 T = TypeVar("T")
-
-
-class JsonSerializer(Protocol[T]):
-
-    @staticmethod
-    def to_json(entity) -> dict:
-        ...
-
-    @staticmethod
-    def from_json(json_dict: dict) -> T:
-        ...
 
 
 class UserSerializer:

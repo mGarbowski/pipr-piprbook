@@ -1,11 +1,28 @@
 import json
-from typing import TextIO, Optional, Type, TypeVar
+from typing import TextIO, Optional, TypeVar, Protocol
 
-from core.model import JsonSerializable
 
-T = TypeVar("T", bound=JsonSerializable)
+class Entity(Protocol):
+    uuid: str
+
+
+T = TypeVar("T", bound=Entity)
+
+
+class JsonSerializer(Protocol):
+
+    @staticmethod
+    def to_json(entity) -> dict:
+        ...
+
+    @staticmethod
+    def from_json(json_dict: dict) -> Entity:
+        ...
+
+
 Collection = dict[str, T]
 SerializedCollection = dict[str, dict]
+SerializerMapping = dict[type[T], JsonSerializer]
 
 
 class JsonDatabase:
@@ -23,7 +40,7 @@ class JsonDatabase:
     mapping is passed as a contructor parameter
     """
 
-    def __init__(self, db_file: TextIO, collection_name_mapping: dict[type, str]):
+    def __init__(self, db_file: TextIO, collection_name_mapping: dict[type, str], serializers: SerializerMapping):
         """Create a new database instance persisting data in the given file
 
         :param db_file: file to persist data in
@@ -32,8 +49,9 @@ class JsonDatabase:
         JsonDatabase._verify_file(db_file, collection_name_mapping)
         self.__db_file = db_file
         self.__collection_name_mapping = collection_name_mapping
+        self.__serializers = serializers
 
-    def get_item(self, item_id: str, item_type: Type[T]) -> Optional[T]:
+    def get_item(self, item_id: str, item_type: type[T]) -> Optional[T]:
         """Get an entity by its id or None if not found
 
         :param item_id: id of entity
@@ -44,14 +62,16 @@ class JsonDatabase:
             return None
 
         item_json = collection[item_id]
-        return item_type.from_json(item_json)
+        serializer = self.__serializers[item_type]
+        return serializer.from_json(item_json)
 
     def save_item(self, item: T) -> None:
         """Save an entity to the database, overwriting previous value if it existed"""
         collection_type = type(item)
+        serializer = self.__serializers[collection_type]
         collection_name = self._collection_name(collection_type)
         collection = self._get_serialized_collection(collection_type)
-        collection[item.uuid] = item.to_json()
+        collection[item.uuid] = serializer.to_json(item)
         self._save_serialized_collection(collection, collection_name)
 
     def delete_item(self, item: T) -> None:
@@ -78,9 +98,9 @@ class JsonDatabase:
     def get_collection(self, collection_type: type[T]) -> Collection:
         """Get collection of entities by their type"""
         serialized_collection = self._get_serialized_collection(collection_type)
-        return _deserialize_collection(serialized_collection, collection_type)
+        return self._deserialize_collection(serialized_collection, collection_type)
 
-    def save_collection(self, collection: Collection, collection_type: Optional[type] = None) -> None:
+    def save_collection(self, collection: Collection, collection_type: Optional[type[T]] = None) -> None:
         """Save a collection to the database, overwriting all existing items
 
         :param collection: collection of entities to save in the database
@@ -99,10 +119,10 @@ class JsonDatabase:
         collection_type = _infer_collection_type(collection) if collection_type is None else collection_type
         name = self._collection_name(collection_type)
 
-        serialized_collection = _serialize_collection(collection)
+        serialized_collection = self._serialize_collection(collection)
         self._save_serialized_collection(serialized_collection, name)
 
-    def _get_serialized_collection(self, collection_type: type[JsonSerializable]) -> SerializedCollection:
+    def _get_serialized_collection(self, collection_type: type[T]) -> SerializedCollection:
         """Get serialized collection of a given type"""
         name = self._collection_name(collection_type)
         serialized_collections = self._load_all_collections()
@@ -133,6 +153,33 @@ class JsonDatabase:
         self.__db_file.seek(0)  # Go to the first byte before reading
         self.__db_file.truncate(0)  # Delete file content
         json.dump(collections, self.__db_file)
+
+    def _serialize_collection(self, collection: Collection) -> SerializedCollection:
+        """Serialize a collection to JSON format"""
+        if not collection:
+            return {}
+
+        item_type = _infer_collection_type(collection)
+        serializer = self.__serializers[item_type]
+        return {
+            uuid: serializer.to_json(item)
+            for uuid, item in collection.items()
+        }
+
+    def _deserialize_collection(
+            self,
+            serialized_collection: SerializedCollection,
+            collection_type: type[T]
+    ) -> Collection:
+        """Deserialize a collection from JSON format"""
+        if not serialized_collection:
+            return {}
+
+        serializer = self.__serializers[collection_type]
+        return {
+            uuid: serializer.from_json(item_json)
+            for uuid, item_json in serialized_collection.items()
+        }
 
     @staticmethod
     def _verify_file(db_file: TextIO, collection_name_mapping: dict[type, str]) -> None:
@@ -165,25 +212,6 @@ def _infer_collection_type(collection: Collection) -> type:
     items = list(collection.values())
     first_item = items[0]
     return type(first_item)
-
-
-def _serialize_collection(collection: Collection) -> SerializedCollection:
-    """Serialize a collection to JSON format"""
-    return {
-        uuid: item.to_json()
-        for uuid, item in collection.items()
-    }
-
-
-def _deserialize_collection(
-        serialized_collection: SerializedCollection,
-        collection_type: type[JsonSerializable]
-) -> Collection:
-    """Deserialize a collection from JSON format"""
-    return {
-        uuid: collection_type.from_json(item_json)
-        for uuid, item_json in serialized_collection.items()
-    }
 
 
 class InvalidDatabaseFileError(ValueError):
