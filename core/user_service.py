@@ -4,7 +4,7 @@ from typing import Optional
 from core.authentication import Authentication, UnauthorizedError
 from core.common import generate_uuid
 from core.model import FriendRequest, Message, User
-from persistence.interface import (
+from persistence.repositories import (
     FriendRequestRepository, MessageRepository, PhotoRepository, UserRepository
 )
 
@@ -85,5 +85,3 @@ class UserService:
     def _check_if_logged_in(self, user: User) -> None:
         if user != self.__authentication.logged_in_user:
             raise UnauthorizedError()
-
-

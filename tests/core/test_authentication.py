@@ -4,7 +4,7 @@ from pytest import raises, fixture
 
 from core.authentication import Authentication, IncorrectPasswordError, UserDoesNotExistError, hash_password
 from core.model import User
-from persistence.interface import UserRepository
+from persistence.repositories import UserRepository
 
 
 @fixture

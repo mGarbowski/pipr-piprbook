@@ -4,7 +4,7 @@ from core.model import User, Message, FriendRequest
 from persistence.interface import Database, JsonSerializer
 
 
-class FilesystemUserRepository:
+class UserRepository:
     def __init__(self, database: Database, serializer: JsonSerializer[User],
                  collection_name: str = "users"):
         self.__database = database
@@ -29,7 +29,7 @@ class FilesystemUserRepository:
         return users[0] if users else None
 
 
-class FilesystemMessageRepository:
+class MessageRepository:
     def __init__(self, database: Database, serializer: JsonSerializer[Message],
                  collection_name: str = "messages"):
         self.__database = database
@@ -60,7 +60,7 @@ def _is_message_matched(message: Message, user_a: User, user_b: User) -> bool:
     return message.to_user_id in user_ids or message.from_user_id in user_ids
 
 
-class FilesystemFriendRequestRepository:
+class FriendRequestRepository:
     def __init__(self, database: Database, serializer: JsonSerializer[FriendRequest],
                  collection_name: str = "friend_requests"):
         self.__database = database
@@ -93,3 +93,7 @@ class FilesystemFriendRequestRepository:
     def _get_all_requests(self) -> list[FriendRequest]:
         requests_json = self.__database.get_collection(self.__collection_name)
         return [self.__serializer.from_json(req_json) for req_json in requests_json]
+
+
+class PhotoRepository:
+    pass
