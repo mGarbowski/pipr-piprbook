@@ -1,4 +1,4 @@
-from typing import TextIO, Tuple
+from typing import TextIO
 
 from core.authentication import Authentication
 from core.model import User, Message, FriendRequest
@@ -8,7 +8,7 @@ from persistence.json_database import JsonDatabase
 from persistence.repositories import PhotoRepository, MessageRepository, UserRepository, FriendRequestRepository
 
 
-def get_default_config(db_file: TextIO) -> Tuple[Authentication, UserService]:
+def get_user_service_default(db_file: TextIO) -> UserService:
     collection_names = {
         User: "users",
         Message: "messages",
@@ -34,4 +34,4 @@ def get_default_config(db_file: TextIO) -> Tuple[Authentication, UserService]:
         photo_repository
     )
 
-    return authentication, user_service
+    return user_service

@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional, List
 
-from core.authentication import Authentication, UnauthorizedError
+from core.authentication import Authentication, UnauthorizedError, LoginFailedException
 from core.common import generate_uuid
 from core.model import FriendRequest, Message, User
 from persistence.repositories import (
@@ -24,6 +24,14 @@ class UserService:
         self.__message_repository = message_repository
         self.__friend_request_repository = friend_request_repository
         self.__photo_repository = photo_repository
+
+    def log_in_user(self, username: str, password: str) -> bool:
+        """Attempt to log in, return True if successful"""
+        try:
+            self.__authentication.log_in(username, password)
+            return True
+        except LoginFailedException:
+            return False
 
     def save_user(self, user: User) -> User:
         return self.__user_repository.save(user)
