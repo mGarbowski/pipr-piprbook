@@ -6,19 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>824</width>
+    <height>554</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>PIPRbook</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout_4">
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="login_page">
        <layout class="QVBoxLayout" name="verticalLayout">
@@ -54,7 +54,7 @@
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>242</width>
+               <width>250</width>
                <height>20</height>
               </size>
              </property>
@@ -108,6 +108,20 @@
                 </property>
                </widget>
               </item>
+              <item>
+               <widget class="QLabel" name="register_label">
+                <property name="text">
+                 <string>or create new account</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="register_button">
+                <property name="text">
+                 <string>Register</string>
+                </property>
+               </widget>
+              </item>
              </layout>
             </widget>
            </item>
@@ -118,7 +132,7 @@
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>242</width>
+               <width>250</width>
                <height>20</height>
               </size>
              </property>
@@ -145,18 +159,122 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="page_2">
-       <widget class="QLabel" name="label_2">
+      <widget class="QWidget" name="register_page">
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QLabel" name="register_page_label">
+          <property name="text">
+           <string>Register</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="username_label_2">
+          <property name="text">
+           <string>Username</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="username_input_2">
+          <property name="placeholderText">
+           <string>username</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="email_label">
+          <property name="text">
+           <string>Email address</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="email_input">
+          <property name="placeholderText">
+           <string>email@example.com</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="password_label_2">
+          <property name="text">
+           <string>Password</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="password_input_2">
+          <property name="echoMode">
+           <enum>QLineEdit::Password</enum>
+          </property>
+          <property name="placeholderText">
+           <string>password</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="confirm_password_label">
+          <property name="text">
+           <string>Confirm password</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="confirm_password_input">
+          <property name="echoMode">
+           <enum>QLineEdit::Password</enum>
+          </property>
+          <property name="placeholderText">
+           <string>password</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="create_account_button">
+          <property name="text">
+           <string>Create account</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="registration_failed_message">
+          <property name="text">
+           <string>placeholder</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="back_to_login_label">
+          <property name="text">
+           <string>or log in to an existing account</string>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="back_to_login_button">
+          <property name="text">
+           <string>Back</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="home_page">
+       <widget class="QLabel" name="home_page_label">
         <property name="geometry">
          <rect>
-          <x>290</x>
+          <x>330</x>
           <y>30</y>
           <width>59</width>
           <height>15</height>
          </rect>
         </property>
         <property name="text">
-         <string>Logged in</string>
+         <string>Home</string>
         </property>
        </widget>
       </widget>
@@ -169,7 +287,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>824</width>
      <height>20</height>
     </rect>
    </property>

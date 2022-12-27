@@ -1,5 +1,7 @@
 from copy import deepcopy
 from hashlib import sha256
+from random import choices
+from string import ascii_letters
 from typing import Optional
 
 from core.model import User
@@ -68,6 +70,10 @@ def hash_password(password: str, salt: str) -> str:
     utf_encoded = salted_password.encode("utf-8")
     hashed_password = sha256(utf_encoded).hexdigest()
     return hashed_password
+
+
+def generate_salt() -> str:
+    return "".join(choices(ascii_letters, k=10))
 
 
 class LoginFailedException(Exception):

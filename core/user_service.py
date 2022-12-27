@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional, List
 
-from core.authentication import Authentication, UnauthorizedError, LoginFailedException
+from core.authentication import Authentication, UnauthorizedError, LoginFailedException, hash_password, generate_salt
 from core.common import generate_uuid
 from core.model import FriendRequest, Message, User
 from persistence.repositories import (
@@ -32,6 +32,26 @@ class UserService:
             return True
         except LoginFailedException:
             return False
+
+    def register_new_user(self, username: str, email: str, password: str) -> None:
+        """Attempt to register new user with given credentials"""
+        if self.__user_repository.get_by_username(username) is not None:
+            raise UsernameTakenException(username)
+        if self.__user_repository.get_by_email(email) is not None:
+            raise EmailAlreadyUsedException(email)
+        # TODO: validate weak password
+        # TODO: validate username
+        # TODO: validate email address
+
+        salt = generate_salt()
+        user = User(
+            uuid=generate_uuid(),
+            username=username,
+            email=email,
+            password_hash=hash_password(password, salt),
+            salt=salt
+        )
+        self.save_user(user)
 
     def save_user(self, user: User) -> User:
         return self.__user_repository.save(user)
@@ -93,3 +113,24 @@ class UserService:
     def _check_if_logged_in(self, user: User) -> None:
         if user != self.__authentication.logged_in_user:
             raise UnauthorizedError()
+
+
+class RegistrationException(Exception):
+    pass
+
+
+class UsernameTakenException(RegistrationException):
+    def __init__(self, username):
+        super().__init__("Username is already taken by someone else")
+        self.username = username
+
+
+class EmailAlreadyUsedException(RegistrationException):
+    def __init__(self, email):
+        super().__init__("There already exists a user with this email address")
+        self.email = email
+
+
+class WeakPasswordException(RegistrationException):
+    def __init__(self):
+        super().__init__("Password is too weak")

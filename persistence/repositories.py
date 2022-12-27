@@ -11,6 +11,11 @@ class UserRepository:
         self.__serializer = serializer
         self.__collection_name = collection_name
 
+    def get_all(self) -> List[User]:
+        users_json = self.__database.get_collection(self.__collection_name)
+        users = [self.__serializer.from_json(user_json) for user_json in users_json]
+        return users
+
     def save(self, user: User):
         user_dict = self.__serializer.to_json(user)
         self.__database.save(user_dict, self.__collection_name)
@@ -23,9 +28,13 @@ class UserRepository:
         self.__database.delete_by_id(user.uuid, self.__collection_name)
 
     def get_by_username(self, username: str) -> Optional[User]:
-        users_json = self.__database.get_collection(self.__collection_name)
-        users = [self.__serializer.from_json(user_json) for user_json in users_json]
+        users = self.get_all()
         users = [user for user in users if user.username == username]
+        return users[0] if users else None
+
+    def get_by_email(self, email: str) -> Optional[User]:
+        users = self.get_all()
+        users = [user for user in users if user.email == email]
         return users[0] if users else None
 
 
