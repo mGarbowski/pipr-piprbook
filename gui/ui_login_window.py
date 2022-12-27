@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'piprbook_desktop.ui'
+## Form generated from reading UI file 'login_window.ui'
 ##
 ## Created by: Qt User Interface Compiler version 5.15.2
 ##
@@ -13,12 +13,12 @@ from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 
 
-class Ui_MainWindow(object):
-    def setupUi(self, MainWindow):
-        if not MainWindow.objectName():
-            MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(824, 554)
-        self.centralwidget = QWidget(MainWindow)
+class Ui_login_window(object):
+    def setupUi(self, login_window):
+        if not login_window.objectName():
+            login_window.setObjectName(u"login_window")
+        login_window.resize(719, 554)
+        self.centralwidget = QWidget(login_window)
         self.centralwidget.setObjectName(u"centralwidget")
         self.verticalLayout_4 = QVBoxLayout(self.centralwidget)
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
@@ -190,51 +190,55 @@ class Ui_MainWindow(object):
         self.home_page_label = QLabel(self.home_page)
         self.home_page_label.setObjectName(u"home_page_label")
         self.home_page_label.setGeometry(QRect(330, 30, 59, 15))
+        self.go_button = QPushButton(self.home_page)
+        self.go_button.setObjectName(u"go_button")
+        self.go_button.setGeometry(QRect(310, 110, 80, 23))
         self.stackedWidget.addWidget(self.home_page)
 
         self.verticalLayout_4.addWidget(self.stackedWidget)
 
-        MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QMenuBar(MainWindow)
+        login_window.setCentralWidget(self.centralwidget)
+        self.menubar = QMenuBar(login_window)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 824, 20))
-        MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QStatusBar(MainWindow)
+        self.menubar.setGeometry(QRect(0, 0, 719, 20))
+        login_window.setMenuBar(self.menubar)
+        self.statusbar = QStatusBar(login_window)
         self.statusbar.setObjectName(u"statusbar")
-        MainWindow.setStatusBar(self.statusbar)
+        login_window.setStatusBar(self.statusbar)
 
-        self.retranslateUi(MainWindow)
+        self.retranslateUi(login_window)
 
-        self.stackedWidget.setCurrentIndex(1)
+        self.stackedWidget.setCurrentIndex(2)
 
 
-        QMetaObject.connectSlotsByName(MainWindow)
+        QMetaObject.connectSlotsByName(login_window)
     # setupUi
 
-    def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"PIPRbook", None))
-        self.login_page_label.setText(QCoreApplication.translate("MainWindow", u"Log in", None))
-        self.username_label.setText(QCoreApplication.translate("MainWindow", u"Username", None))
-        self.username_input.setPlaceholderText(QCoreApplication.translate("MainWindow", u"username", None))
-        self.password_label.setText(QCoreApplication.translate("MainWindow", u"Password", None))
-        self.password_input.setPlaceholderText(QCoreApplication.translate("MainWindow", u"password", None))
-        self.log_in_button.setText(QCoreApplication.translate("MainWindow", u"Log in", None))
-        self.login_failed_text.setText(QCoreApplication.translate("MainWindow", u"placeholder", None))
-        self.register_label.setText(QCoreApplication.translate("MainWindow", u"or create new account", None))
-        self.register_button.setText(QCoreApplication.translate("MainWindow", u"Register", None))
-        self.register_page_label.setText(QCoreApplication.translate("MainWindow", u"Register", None))
-        self.username_label_2.setText(QCoreApplication.translate("MainWindow", u"Username", None))
-        self.username_input_2.setPlaceholderText(QCoreApplication.translate("MainWindow", u"username", None))
-        self.email_label.setText(QCoreApplication.translate("MainWindow", u"Email address", None))
-        self.email_input.setPlaceholderText(QCoreApplication.translate("MainWindow", u"email@example.com", None))
-        self.password_label_2.setText(QCoreApplication.translate("MainWindow", u"Password", None))
-        self.password_input_2.setPlaceholderText(QCoreApplication.translate("MainWindow", u"password", None))
-        self.confirm_password_label.setText(QCoreApplication.translate("MainWindow", u"Confirm password", None))
-        self.confirm_password_input.setPlaceholderText(QCoreApplication.translate("MainWindow", u"password", None))
-        self.create_account_button.setText(QCoreApplication.translate("MainWindow", u"Create account", None))
-        self.registration_failed_message.setText(QCoreApplication.translate("MainWindow", u"placeholder", None))
-        self.back_to_login_label.setText(QCoreApplication.translate("MainWindow", u"or log in to an existing account", None))
-        self.back_to_login_button.setText(QCoreApplication.translate("MainWindow", u"Back", None))
-        self.home_page_label.setText(QCoreApplication.translate("MainWindow", u"Home", None))
+    def retranslateUi(self, login_window):
+        login_window.setWindowTitle(QCoreApplication.translate("login_window", u"PIPRbook Login", None))
+        self.login_page_label.setText(QCoreApplication.translate("login_window", u"Log in", None))
+        self.username_label.setText(QCoreApplication.translate("login_window", u"Username", None))
+        self.username_input.setPlaceholderText(QCoreApplication.translate("login_window", u"username", None))
+        self.password_label.setText(QCoreApplication.translate("login_window", u"Password", None))
+        self.password_input.setPlaceholderText(QCoreApplication.translate("login_window", u"password", None))
+        self.log_in_button.setText(QCoreApplication.translate("login_window", u"Log in", None))
+        self.login_failed_text.setText(QCoreApplication.translate("login_window", u"placeholder", None))
+        self.register_label.setText(QCoreApplication.translate("login_window", u"or create new account", None))
+        self.register_button.setText(QCoreApplication.translate("login_window", u"Register", None))
+        self.register_page_label.setText(QCoreApplication.translate("login_window", u"Register", None))
+        self.username_label_2.setText(QCoreApplication.translate("login_window", u"Username", None))
+        self.username_input_2.setPlaceholderText(QCoreApplication.translate("login_window", u"username", None))
+        self.email_label.setText(QCoreApplication.translate("login_window", u"Email address", None))
+        self.email_input.setPlaceholderText(QCoreApplication.translate("login_window", u"email@example.com", None))
+        self.password_label_2.setText(QCoreApplication.translate("login_window", u"Password", None))
+        self.password_input_2.setPlaceholderText(QCoreApplication.translate("login_window", u"password", None))
+        self.confirm_password_label.setText(QCoreApplication.translate("login_window", u"Confirm password", None))
+        self.confirm_password_input.setPlaceholderText(QCoreApplication.translate("login_window", u"password", None))
+        self.create_account_button.setText(QCoreApplication.translate("login_window", u"Create account", None))
+        self.registration_failed_message.setText(QCoreApplication.translate("login_window", u"placeholder", None))
+        self.back_to_login_label.setText(QCoreApplication.translate("login_window", u"or log in to an existing account", None))
+        self.back_to_login_button.setText(QCoreApplication.translate("login_window", u"Back", None))
+        self.home_page_label.setText(QCoreApplication.translate("login_window", u"Home", None))
+        self.go_button.setText(QCoreApplication.translate("login_window", u"Go", None))
     # retranslateUi
 

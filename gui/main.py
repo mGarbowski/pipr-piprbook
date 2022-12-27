@@ -5,7 +5,8 @@ from PySide2.QtWidgets import QMainWindow, QApplication
 
 from core.factory import get_user_service_default
 from core.user_service import UserService, UsernameTakenException, EmailAlreadyUsedException, RegistrationException
-from gui.ui_piprbook_desktop import Ui_MainWindow
+from gui.ui_login_window import Ui_login_window
+from gui.ui_main_window import Ui_main_window
 
 
 class Page(Enum):
@@ -14,10 +15,10 @@ class Page(Enum):
     HOME = 2
 
 
-class PiprbookWindow(QMainWindow):
+class LoginWindow(QMainWindow):
     def __init__(self, user_service: UserService, parent=None):
         super().__init__(parent)
-        self.ui = Ui_MainWindow()
+        self.ui = Ui_login_window()
         self.ui.setupUi(self)
         self.user_service = user_service
 
@@ -37,7 +38,7 @@ class PiprbookWindow(QMainWindow):
         password = self.ui.password_input.text()
         success = self.user_service.log_in_user(username, password)
         if success:
-            self.ui.stackedWidget.setCurrentIndex(Page.HOME.value)
+            self._open_main_window()
         else:
             self.ui.login_failed_text.setText("Wrong username or password")
             self.ui.username_input.setText("")
@@ -45,6 +46,7 @@ class PiprbookWindow(QMainWindow):
 
     def _setup_register_page(self):
         self.ui.create_account_button.clicked.connect(self._register_user)
+        self._clear_registration_form()
         self.ui.back_to_login_button.clicked.connect(
             lambda: self.ui.stackedWidget.setCurrentIndex(Page.LOGIN.value)
         )
@@ -62,7 +64,7 @@ class PiprbookWindow(QMainWindow):
 
         try:
             self.user_service.register_new_user(username, email, password)
-            self.ui.stackedWidget.setCurrentIndex(Page.HOME.value)
+            self.ui.stackedWidget.setCurrentIndex(Page.LOGIN.value)
         except UsernameTakenException:
             self._clear_registration_form()
             self.ui.registration_failed_message.setText("Username is already taken")
@@ -80,6 +82,28 @@ class PiprbookWindow(QMainWindow):
         self.ui.password_input_2.setText("")
         self.ui.confirm_password_input.setText("")
 
+    def _open_main_window(self):
+        self.main_window = MainWindow(self.user_service)
+        self.main_window.show()
+        self.hide()
+
+
+class MainWindow(QMainWindow):
+    def __init__(self, user_service: UserService, parent=None):
+        super().__init__(parent)
+        self.ui = Ui_main_window()
+        self.ui.setupUi(self)
+        self.user_service = user_service
+        self.user = self.user_service.get_current_user()
+
+        self._show_user_info()
+
+    def _show_user_info(self):
+        user = self.user
+        self.ui.user_info_label.setText(
+            f"{user.uuid=}\n{user.username=}\n{user.email=}\n{user.bio=}"
+        )
+
 
 def main(args):
     db_filename = args[1]
@@ -87,7 +111,7 @@ def main(args):
     user_service = get_user_service_default(db_file)
 
     app = QApplication(args)
-    window = PiprbookWindow(user_service)
+    window = LoginWindow(user_service)
     window.show()
     return app.exec_()
 

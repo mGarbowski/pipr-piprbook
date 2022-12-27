@@ -53,6 +53,9 @@ class UserService:
         )
         self.save_user(user)
 
+    def get_current_user(self) -> User:
+        return self.__authentication.logged_in_user
+
     def save_user(self, user: User) -> User:
         return self.__user_repository.save(user)
 
