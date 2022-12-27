@@ -70,7 +70,11 @@ def hash_password(password: str, salt: str) -> str:
     return hashed_password
 
 
-class UserDoesNotExistError(Exception):
+class LoginFailedException(Exception):
+    pass
+
+
+class UserDoesNotExistError(LoginFailedException):
     """Exception signaling that there is no user with given login/username"""
 
     def __init__(self, username):
@@ -78,7 +82,7 @@ class UserDoesNotExistError(Exception):
         self.username = username
 
 
-class IncorrectPasswordError(Exception):
+class IncorrectPasswordError(LoginFailedException):
     """Exception singaling that given password is incorrect"""
 
     def __init__(self):

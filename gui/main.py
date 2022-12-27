@@ -2,19 +2,46 @@ import sys
 
 from PySide2.QtWidgets import QMainWindow, QApplication
 
+from core.authentication import Authentication, LoginFailedException
+from core.factory import get_default_config
+from core.user_service import UserService
 from gui.ui_piprbook_desktop import Ui_MainWindow
 
 
 class PiprbookWindow(QMainWindow):
-    def __init__(self, parent=None):
+    def __init__(self, user_service: UserService, authentication: Authentication, parent=None):
         super().__init__(parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.user_service = user_service
+        self.authentication = authentication
+
+        self.ui.stackedWidget.setCurrentIndex(0)
+        self._setup_login_page()
+
+    def _setup_login_page(self):
+        self.ui.log_in_button.clicked.connect(self._log_in_user)
+        self.ui.login_failed_text.setText("")
+
+    def _log_in_user(self):
+        username = self.ui.username_input.text()
+        password = self.ui.password_input.text()
+        try:
+            self.authentication.log_in(username, password)
+            self.ui.stackedWidget.setCurrentIndex(1)
+        except LoginFailedException:
+            self.ui.login_failed_text.setText("Wrong username or password")
+            self.ui.username_input.setText("")
+            self.ui.password_input.setText("")
 
 
 def main(args):
+    db_filename = args[1]
+    db_file = open(db_filename, mode="r+", encoding="utf-8")
+    authentication, user_service = get_default_config(db_file)
+
     app = QApplication(args)
-    window = PiprbookWindow()
+    window = PiprbookWindow(user_service, authentication)
     window.show()
     return app.exec_()
 
