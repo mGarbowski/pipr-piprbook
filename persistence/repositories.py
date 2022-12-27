@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 
 from core.model import User, Message, FriendRequest
 from persistence.interface import Database, JsonSerializer
@@ -47,7 +47,7 @@ class MessageRepository:
     def delete(self, message: Message):
         self.__database.delete_by_id(message.uuid, self.__collection_name)
 
-    def get_messages(self, user_a: User, user_b: User) -> list[Message]:
+    def get_messages(self, user_a: User, user_b: User) -> List[Message]:
         messages_json = self.__database.get_collection(self.__collection_name)
         messages = [self.__serializer.from_json(message_json) for message_json in messages_json]
         messages = [msg for msg in messages if _is_message_matched(msg, user_a, user_b)]
@@ -78,19 +78,19 @@ class FriendRequestRepository:
     def delete(self, friend_request: FriendRequest):
         self.__database.delete_by_id(friend_request.uuid, self.__collection_name)
 
-    def get_requests_to_user(self, to_user: User) -> list[FriendRequest]:
+    def get_requests_to_user(self, to_user: User) -> List[FriendRequest]:
         requests = self._get_all_requests()
         requests = [req for req in requests if req.to_user_id == to_user.uuid]
         requests = sorted(requests, key=lambda req: req.timestamp)
         return requests
 
-    def get_requests_from_user(self, from_user: User) -> list[FriendRequest]:
+    def get_requests_from_user(self, from_user: User) -> List[FriendRequest]:
         requests = self._get_all_requests()
         requests = [req for req in requests if req.from_user_id == from_user.uuid]
         requests = sorted(requests, key=lambda req: req.timestamp)
         return requests
 
-    def _get_all_requests(self) -> list[FriendRequest]:
+    def _get_all_requests(self) -> List[FriendRequest]:
         requests_json = self.__database.get_collection(self.__collection_name)
         return [self.__serializer.from_json(req_json) for req_json in requests_json]
 

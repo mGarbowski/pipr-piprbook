@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 from core.authentication import Authentication, UnauthorizedError
 from core.common import generate_uuid
@@ -75,7 +75,7 @@ class UserService:
         self.__user_repository.save(from_user)
         self.__friend_request_repository.delete(friend_request)
 
-    def get_messages(self, user_a: User, user_b: User, count: Optional[int] = None, offset: int = 0) -> list[Message]:
+    def get_messages(self, user_a: User, user_b: User, count: Optional[int] = None, offset: int = 0) -> List[Message]:
         current_user = self.__authentication.logged_in_user
         if user_a != current_user and user_b != current_user:
             raise UnauthorizedError()

@@ -1,7 +1,7 @@
 import json
-from typing import TextIO, Optional
+from typing import TextIO, Optional, Dict, Type, List
 
-SerializedCollection = dict[str, dict]
+SerializedCollection = Dict[str, Dict]
 
 
 # TODO: update docs, refactor, add unit tests
@@ -20,7 +20,7 @@ class JsonDatabase:
     mapping is passed as a contructor parameter
     """
 
-    def __init__(self, db_file: TextIO, collection_name_mapping: dict[type, str]):
+    def __init__(self, db_file: TextIO, collection_name_mapping: Dict[Type, str]):
         """Create a new database instance persisting data in the given file
 
         :param db_file: file to persist data in
@@ -30,7 +30,7 @@ class JsonDatabase:
         self.__db_file = db_file
         self.__collection_name_mapping = collection_name_mapping
 
-    def get_by_id(self, entity_id: str, collection_name: str) -> Optional[dict]:
+    def get_by_id(self, entity_id: str, collection_name: str) -> Optional[Dict]:
         """Get an entity by its id or None if not found
 
         :param entity_id: id of entity
@@ -39,7 +39,7 @@ class JsonDatabase:
         collection = self._get_serialized_collection(collection_name)
         return collection[entity_id] if entity_id in collection else None
 
-    def save(self, entity_dict: dict, collection_name: str) -> None:
+    def save(self, entity_dict: Dict, collection_name: str) -> None:
         """Save an entity to the database, overwriting previous value if it existed"""
         collection = self._get_serialized_collection(collection_name)
         collection[entity_dict["uuid"]] = entity_dict
@@ -57,12 +57,12 @@ class JsonDatabase:
         except KeyError:
             pass
 
-    def get_collection(self, collection_name: str) -> list[dict]:
+    def get_collection(self, collection_name: str) -> List[Dict]:
         """Get collection of entities by their type"""
         collection = self._get_serialized_collection(collection_name)
         return list(collection.values())
 
-    def save_collection(self, collection: list[dict], collection_name: str) -> None:
+    def save_collection(self, collection: List[Dict], collection_name: str) -> None:
         """Save a collection to the database, overwriting all existing items
 
         :param collection: collection of entities to save in the database
@@ -90,20 +90,20 @@ class JsonDatabase:
         all_collections[collection_name] = serialized_collection
         self._save_all_collections(all_collections)
 
-    def _load_all_collections(self) -> dict[str, SerializedCollection]:
+    def _load_all_collections(self) -> Dict[str, SerializedCollection]:
         """Load database from file"""
         self.__db_file.seek(0)  # Go to the first byte before reading
         data = json.load(self.__db_file)
         return data
 
-    def _save_all_collections(self, collections: dict[str, SerializedCollection]) -> None:
+    def _save_all_collections(self, collections: Dict[str, SerializedCollection]) -> None:
         """Save database to the file"""
         self.__db_file.seek(0)  # Go to the first byte before reading
         self.__db_file.truncate(0)  # Delete file content
         json.dump(collections, self.__db_file)
 
     @staticmethod
-    def _verify_file(db_file: TextIO, collection_name_mapping: dict[type, str]) -> None:
+    def _verify_file(db_file: TextIO, collection_name_mapping: Dict[Type, str]) -> None:
         """Verify that given file valid for given mapping of collection names
 
         File must be readable and writable.

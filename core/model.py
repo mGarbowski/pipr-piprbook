@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 
-from typing import Optional, Protocol
+from typing import Optional, Protocol, List
 
 
 class Entity(Protocol):
@@ -15,7 +15,7 @@ class User:
     email: str
     password_hash: str
     salt: str
-    friend_uuids: list[str] = field(default_factory=list)
+    friend_uuids: List[str] = field(default_factory=list)
     profile_picture_id: Optional[str] = None
     bio: Optional[str] = None
 

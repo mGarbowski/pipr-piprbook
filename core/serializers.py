@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import TypeVar
+from typing import TypeVar, Dict
 
 from core.model import User, Message, FriendRequest
 
@@ -9,7 +9,7 @@ T = TypeVar("T")
 class UserSerializer:
 
     @staticmethod
-    def to_json(entity: User) -> dict:
+    def to_json(entity: User) -> Dict:
         """Convert user object to JSON representation"""
         return {
             "uuid": entity.uuid,
@@ -23,7 +23,7 @@ class UserSerializer:
         }
 
     @staticmethod
-    def from_json(json_dict: dict) -> User:
+    def from_json(json_dict: Dict) -> User:
         """Create user object from its JSON representation
 
         :raises RepresentationError: if given json is not a valid representation of a user
@@ -45,7 +45,7 @@ class UserSerializer:
 
 class MessageSerializer:
     @staticmethod
-    def to_json(entity: Message) -> dict:
+    def to_json(entity: Message) -> Dict:
         """Convert a message object to JSON representation
 
         Timestamps are stored as ISO-format strings
@@ -59,7 +59,7 @@ class MessageSerializer:
         }
 
     @staticmethod
-    def from_json(json_dict: dict) -> Message:
+    def from_json(json_dict: Dict) -> Message:
         """Create a message object from its JSON representation
 
         :raises RepresentationError: if json is not a valid representation of a message
@@ -78,7 +78,7 @@ class MessageSerializer:
 
 class FriendRequestSerializer:
     @staticmethod
-    def to_json(entity: FriendRequest) -> dict:
+    def to_json(entity: FriendRequest) -> Dict:
         """Convert a friend request object to a JSON representation
 
         Timestamps are stored as ISO-format strings
@@ -91,7 +91,7 @@ class FriendRequestSerializer:
         }
 
     @staticmethod
-    def from_json(json_dict: dict) -> FriendRequest:
+    def from_json(json_dict: Dict) -> FriendRequest:
         """Create a friend request object from its JSON representation
 
         :raises RepresentationError: if json is not a valid representation of a friend request
