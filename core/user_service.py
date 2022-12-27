@@ -33,6 +33,9 @@ class UserService:
         except LoginFailedException:
             return False
 
+    def log_out_user(self):
+        self.__authentication.log_out()
+
     def register_new_user(self, username: str, email: str, password: str) -> None:
         """Attempt to register new user with given credentials"""
         if self.__user_repository.get_by_username(username) is not None:

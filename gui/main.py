@@ -98,12 +98,19 @@ class MainWindow(QMainWindow):
         self.user = self.user_service.get_current_user()
 
         self._show_user_info()
+        self.ui.log_out_button.clicked.connect(self._log_out)
 
     def _show_user_info(self):
         user = self.user
         self.ui.user_info_label.setText(
             f"{user.uuid=}\n{user.username=}\n{user.email=}\n{user.bio=}"
         )
+
+    def _log_out(self):
+        self.user_service.log_out_user()
+        self.login_window = LoginWindow(self.user_service)
+        self.login_window.show()
+        self.hide()
 
 
 def main(args):

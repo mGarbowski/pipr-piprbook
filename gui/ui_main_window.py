@@ -27,6 +27,9 @@ class Ui_main_window(object):
         self.user_info_label.setObjectName(u"user_info_label")
         self.user_info_label.setGeometry(QRect(230, 110, 351, 231))
         self.user_info_label.setWordWrap(True)
+        self.log_out_button = QPushButton(self.centralwidget)
+        self.log_out_button.setObjectName(u"log_out_button")
+        self.log_out_button.setGeometry(QRect(260, 450, 80, 23))
         main_window.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(main_window)
         self.menubar.setObjectName(u"menubar")
@@ -45,5 +48,6 @@ class Ui_main_window(object):
         main_window.setWindowTitle(QCoreApplication.translate("main_window", u"PIPRbook", None))
         self.header_label.setText(QCoreApplication.translate("main_window", u"Hello", None))
         self.user_info_label.setText(QCoreApplication.translate("main_window", u"user_ifno", None))
+        self.log_out_button.setText(QCoreApplication.translate("main_window", u"Log out", None))
     # retranslateUi
 
