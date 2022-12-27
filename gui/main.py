@@ -1,15 +1,18 @@
 import sys
 from enum import Enum
 
+from PySide2.QtCore import QByteArray
+from PySide2.QtGui import QPixmap
 from PySide2.QtWidgets import QMainWindow, QApplication
 
 from core.factory import get_user_service_default
 from core.user_service import UserService, UsernameTakenException, EmailAlreadyUsedException, RegistrationException
+from gui.resources.resources import get_placeholder_picture
 from gui.ui_login_window import Ui_login_window
 from gui.ui_main_window import Ui_main_window
 
 
-class Page(Enum):
+class LoginWindowPage(Enum):
     LOGIN = 0
     REGISTER = 1
     HOME = 2
@@ -22,14 +25,14 @@ class LoginWindow(QMainWindow):
         self.ui.setupUi(self)
         self.user_service = user_service
 
-        self.ui.stackedWidget.setCurrentIndex(Page.LOGIN.value)
+        self.ui.stackedWidget.setCurrentIndex(LoginWindowPage.LOGIN.value)
         self._setup_login_page()
         self._setup_register_page()
 
     def _setup_login_page(self):
         self.ui.log_in_button.clicked.connect(self._log_in_user)
         self.ui.register_button.clicked.connect(
-            lambda: self.ui.stackedWidget.setCurrentIndex(Page.REGISTER.value)
+            lambda: self.ui.stackedWidget.setCurrentIndex(LoginWindowPage.REGISTER.value)
         )
         self.ui.login_failed_text.setText("")
 
@@ -48,7 +51,7 @@ class LoginWindow(QMainWindow):
         self.ui.create_account_button.clicked.connect(self._register_user)
         self._clear_registration_form()
         self.ui.back_to_login_button.clicked.connect(
-            lambda: self.ui.stackedWidget.setCurrentIndex(Page.LOGIN.value)
+            lambda: self.ui.stackedWidget.setCurrentIndex(LoginWindowPage.LOGIN.value)
         )
 
     def _register_user(self):
@@ -64,7 +67,7 @@ class LoginWindow(QMainWindow):
 
         try:
             self.user_service.register_new_user(username, email, password)
-            self.ui.stackedWidget.setCurrentIndex(Page.LOGIN.value)
+            self.ui.stackedWidget.setCurrentIndex(LoginWindowPage.LOGIN.value)
             self._clear_registration_form()
         except UsernameTakenException:
             self._clear_registration_form()
@@ -89,6 +92,12 @@ class LoginWindow(QMainWindow):
         self.hide()
 
 
+class MainWindowPage(Enum):
+    PROFILE = 0
+    MESSENGER = 1
+    INVITE_FRIENDS = 2
+
+
 class MainWindow(QMainWindow):
     def __init__(self, user_service: UserService, parent=None):
         super().__init__(parent)
@@ -97,14 +106,22 @@ class MainWindow(QMainWindow):
         self.user_service = user_service
         self.user = self.user_service.get_current_user()
 
-        self._show_user_info()
+        self.ui.pages.setCurrentIndex(MainWindowPage.PROFILE.value)
         self.ui.action_log_out.triggered.connect(self._log_out)
+        self._setup_profile_page()
 
-    def _show_user_info(self):
+    def _setup_profile_page(self):
         user = self.user
-        self.ui.user_info_label.setText(
-            f"{user.uuid=}\n{user.username=}\n{user.email=}\n{user.bio=}"
-        )
+
+        self.ui.profile_header.setText(f"{user.username}'s profile")
+        self.ui.username_display.setText(f"Username: {user.username}")
+        self.ui.email_display.setText(f"Email address: {user.email}")
+        self.ui.bio_display.setText(user.bio if user.bio else "No bio set")
+
+        placeholder_picture = get_placeholder_picture()
+        pixmap = QPixmap()
+        pixmap.loadFromData(QByteArray(placeholder_picture))
+        self.ui.profile_picture.setPixmap(pixmap)
 
     def _log_out(self):
         self.user_service.log_out_user()
