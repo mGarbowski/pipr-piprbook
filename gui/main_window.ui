@@ -43,19 +43,6 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QPushButton" name="log_out_button">
-    <property name="geometry">
-     <rect>
-      <x>260</x>
-      <y>450</y>
-      <width>80</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Log out</string>
-    </property>
-   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -66,8 +53,20 @@
      <height>20</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuOptions">
+    <property name="title">
+     <string>Options</string>
+    </property>
+    <addaction name="action_log_out"/>
+   </widget>
+   <addaction name="menuOptions"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="action_log_out">
+   <property name="text">
+    <string>Log out</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

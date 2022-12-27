@@ -98,7 +98,7 @@ class MainWindow(QMainWindow):
         self.user = self.user_service.get_current_user()
 
         self._show_user_info()
-        self.ui.log_out_button.clicked.connect(self._log_out)
+        self.ui.action_log_out.triggered.connect(self._log_out)
 
     def _show_user_info(self):
         user = self.user

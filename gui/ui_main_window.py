@@ -18,6 +18,8 @@ class Ui_main_window(object):
         if not main_window.objectName():
             main_window.setObjectName(u"main_window")
         main_window.resize(800, 600)
+        self.action_log_out = QAction(main_window)
+        self.action_log_out.setObjectName(u"action_log_out")
         self.centralwidget = QWidget(main_window)
         self.centralwidget.setObjectName(u"centralwidget")
         self.header_label = QLabel(self.centralwidget)
@@ -27,17 +29,19 @@ class Ui_main_window(object):
         self.user_info_label.setObjectName(u"user_info_label")
         self.user_info_label.setGeometry(QRect(230, 110, 351, 231))
         self.user_info_label.setWordWrap(True)
-        self.log_out_button = QPushButton(self.centralwidget)
-        self.log_out_button.setObjectName(u"log_out_button")
-        self.log_out_button.setGeometry(QRect(260, 450, 80, 23))
         main_window.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(main_window)
         self.menubar.setObjectName(u"menubar")
         self.menubar.setGeometry(QRect(0, 0, 800, 20))
+        self.menuOptions = QMenu(self.menubar)
+        self.menuOptions.setObjectName(u"menuOptions")
         main_window.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(main_window)
         self.statusbar.setObjectName(u"statusbar")
         main_window.setStatusBar(self.statusbar)
+
+        self.menubar.addAction(self.menuOptions.menuAction())
+        self.menuOptions.addAction(self.action_log_out)
 
         self.retranslateUi(main_window)
 
@@ -46,8 +50,9 @@ class Ui_main_window(object):
 
     def retranslateUi(self, main_window):
         main_window.setWindowTitle(QCoreApplication.translate("main_window", u"PIPRbook", None))
+        self.action_log_out.setText(QCoreApplication.translate("main_window", u"Log out", None))
         self.header_label.setText(QCoreApplication.translate("main_window", u"Hello", None))
         self.user_info_label.setText(QCoreApplication.translate("main_window", u"user_ifno", None))
-        self.log_out_button.setText(QCoreApplication.translate("main_window", u"Log out", None))
+        self.menuOptions.setTitle(QCoreApplication.translate("main_window", u"Options", None))
     # retranslateUi
 
