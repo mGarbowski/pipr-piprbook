@@ -65,6 +65,7 @@ class LoginWindow(QMainWindow):
         try:
             self.user_service.register_new_user(username, email, password)
             self.ui.stackedWidget.setCurrentIndex(Page.LOGIN.value)
+            self._clear_registration_form()
         except UsernameTakenException:
             self._clear_registration_form()
             self.ui.registration_failed_message.setText("Username is already taken")
