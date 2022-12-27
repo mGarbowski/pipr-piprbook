@@ -62,11 +62,11 @@ class UserService:
     def save_user(self, user: User) -> User:
         return self.__user_repository.save(user)
 
-    def set_bio(self, user: User, bio: str) -> User:
+    def set_bio(self, user: User, bio: str):
         self._check_if_logged_in(user)
 
         user.bio = bio
-        return self.save_user(user)
+        self.save_user(user)
 
     def send_message(self, from_user: User, to_user: User, text: str) -> Message:
         self._check_if_logged_in(from_user)
@@ -117,7 +117,7 @@ class UserService:
         return self.__message_repository.get_messages(user_a, user_b, count, offset)
 
     def _check_if_logged_in(self, user: User) -> None:
-        if user != self.__authentication.logged_in_user:
+        if user.uuid != self.__authentication.logged_in_user.uuid:
             raise UnauthorizedError()
 
 

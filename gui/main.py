@@ -116,18 +116,26 @@ class MainWindow(QMainWindow):
         self.ui.profile_header.setText(f"{user.username}'s profile")
         self.ui.username_display.setText(f"Username: {user.username}")
         self.ui.email_display.setText(f"Email address: {user.email}")
-        self.ui.bio_display.setText(user.bio if user.bio else "No bio set")
+        self.ui.bio_display.setText(f"Bio: {user.bio}" if user.bio else "No bio set")
 
         placeholder_picture = get_placeholder_picture()
         pixmap = QPixmap()
         pixmap.loadFromData(QByteArray(placeholder_picture))
         self.ui.profile_picture.setPixmap(pixmap)
 
+        self.ui.update_bio_button.clicked.connect(self._update_user_bio)
+
     def _log_out(self):
         self.user_service.log_out_user()
         self.login_window = LoginWindow(self.user_service)
         self.login_window.show()
         self.hide()
+
+    def _update_user_bio(self):
+        bio = self.ui.bio_input.toPlainText()
+        self.user_service.set_bio(self.user, bio)
+        self.ui.bio_display.setText(f"Bio: {self.user.bio}")
+        self.ui.bio_input.setText("")
 
 
 def main(args):
