@@ -35,3 +35,15 @@ class FriendRequest:
     timestamp: datetime
     from_user_id: str
     to_user_id: str
+
+
+@dataclass
+class Photo:
+    """Class representing a photo
+
+    Content of the binary file is stored as a hexadecimal string
+    """
+    uuid: str
+    filename: str
+    format: str
+    binary_data_hex: str

@@ -1,6 +1,6 @@
 from typing import Optional, List
 
-from core.model import User, Message, FriendRequest
+from core.model import User, Message, FriendRequest, Photo
 from persistence.interface import Database, JsonSerializer
 
 
@@ -105,4 +105,22 @@ class FriendRequestRepository:
 
 
 class PhotoRepository:
-    pass
+
+    def __init__(self, database: Database, serializer: JsonSerializer[Photo],
+                 collection_name: str = "photos"):
+        self.__database = database
+        self.__serializer = serializer
+        self.__collection_name = collection_name
+
+    def save(self, photo: Photo):
+        photo_dict = self.__serializer.to_json(photo)
+        self.__database.save(photo_dict, self.__collection_name)
+
+    def get_by_id(self, photo_id: str) -> Optional[Photo]:
+        photo_dict = self.__database.get_by_id(photo_id, self.__collection_name)
+        return self.__serializer.from_json(photo_dict) if photo_dict else None
+
+    def delete(self, photo: Photo):
+        self.__database.delete_by_id(photo.uuid, self.__collection_name)
+
+# TODO: factor out an abstract class

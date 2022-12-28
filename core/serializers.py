@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import TypeVar, Dict
 
-from core.model import User, Message, FriendRequest
+from core.model import User, Message, FriendRequest, Photo
 
 T = TypeVar("T")
 
@@ -102,6 +102,31 @@ class FriendRequestSerializer:
                 timestamp=datetime.fromisoformat(json_dict["timestamp"]),
                 from_user_id=json_dict["from_user_id"],
                 to_user_id=json_dict["to_user_id"]
+            )
+        except KeyError:
+            raise RepresentationError(json_dict)
+
+
+class PhotoSerializer:
+
+    @staticmethod
+    def to_json(entity: Photo) -> Dict:
+        """Convert a Photo object to a JSON representation"""
+        return {
+            "uuid": entity.uuid,
+            "filename": entity.filename,
+            "format": entity.format,
+            "binary_data_hex": entity.binary_data_hex
+        }
+
+    @staticmethod
+    def from_json(json_dict: Dict) -> Photo:
+        try:
+            return Photo(
+                uuid=json_dict["uuid"],
+                filename=json_dict["filename"],
+                format=json_dict["format"],
+                binary_data_hex=json_dict["binary_data_hex"]
             )
         except KeyError:
             raise RepresentationError(json_dict)
