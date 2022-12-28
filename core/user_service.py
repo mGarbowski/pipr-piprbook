@@ -3,7 +3,7 @@ from typing import Optional, List
 
 from core.authentication import Authentication, UnauthorizedError, LoginFailedException, hash_password, generate_salt
 from core.common import generate_uuid
-from core.model import FriendRequest, Message, User
+from core.model import FriendRequest, Message, User, Photo
 from persistence.repositories import (
     FriendRequestRepository, MessageRepository, PhotoRepository, UserRepository
 )
@@ -67,6 +67,17 @@ class UserService:
 
         user.bio = bio
         self.save_user(user)
+
+    def get_profile_picture(self, user: User) -> Optional[Photo]:
+        return self.__photo_repository.get_by_id(user.profile_picture_id)
+
+    def add_profile_picture(self, user: User, photo: Photo):
+        user.profile_picture_id = photo.uuid
+        self.__user_repository.save(user)
+        self.__photo_repository.save(photo)
+
+    def delete_picture(self, photo: Photo):
+        self.__photo_repository.delete(photo)
 
     def send_message(self, from_user: User, to_user: User, text: str) -> Message:
         self._check_if_logged_in(from_user)

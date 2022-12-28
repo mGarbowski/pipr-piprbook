@@ -1,7 +1,9 @@
 from dataclasses import dataclass, field
 from datetime import datetime
+from pathlib import Path
+from typing import Optional, Protocol, List, BinaryIO
 
-from typing import Optional, Protocol, List
+from core.common import generate_uuid
 
 
 class Entity(Protocol):
@@ -47,3 +49,19 @@ class Photo:
     filename: str
     format: str
     binary_data_hex: str
+
+    def get_bytes(self) -> bytes:
+        return bytes.fromhex(self.binary_data_hex)
+
+    @classmethod
+    def from_file(cls, file_handle: BinaryIO, file_path: str) -> 'Photo':
+        uuid = generate_uuid()
+
+        path = Path(file_path)
+        filename = path.name
+        file_format = path.suffix.replace(".", "")
+
+        photo_data = file_handle.read()
+        binary_data_hex = photo_data.hex()
+
+        return cls(uuid, filename, file_format, binary_data_hex)

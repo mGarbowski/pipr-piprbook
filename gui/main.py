@@ -3,9 +3,10 @@ from enum import Enum
 
 from PySide2.QtCore import QByteArray
 from PySide2.QtGui import QPixmap
-from PySide2.QtWidgets import QMainWindow, QApplication
+from PySide2.QtWidgets import QMainWindow, QApplication, QFileDialog
 
 from core.factory import get_user_service_default
+from core.model import Photo
 from core.user_service import UserService, UsernameTakenException, EmailAlreadyUsedException, RegistrationException
 from gui.resources.resources import get_placeholder_picture
 from gui.ui_login_window import Ui_login_window
@@ -118,12 +119,18 @@ class MainWindow(QMainWindow):
         self.ui.email_display.setText(f"Email address: {user.email}")
         self.ui.bio_display.setText(f"Bio: {user.bio}" if user.bio else "No bio set")
 
-        placeholder_picture = get_placeholder_picture()
-        pixmap = QPixmap()
-        pixmap.loadFromData(QByteArray(placeholder_picture))
-        self.ui.profile_picture.setPixmap(pixmap)
+        self._display_profile_picture()
 
         self.ui.update_bio_button.clicked.connect(self._update_user_bio)
+        self.ui.upload_profile_picture_button.clicked.connect(self._upload_profile_picture)
+
+    def _display_profile_picture(self):
+        profile_picture = self.user_service.get_profile_picture(self.user)
+        profile_picture_bytes = profile_picture.get_bytes() if profile_picture else get_placeholder_picture()
+
+        pixmap = QPixmap()
+        pixmap.loadFromData(QByteArray(profile_picture_bytes))
+        self.ui.profile_picture.setPixmap(pixmap)
 
     def _log_out(self):
         self.user_service.log_out_user()
@@ -136,6 +143,26 @@ class MainWindow(QMainWindow):
         self.user_service.set_bio(self.user, bio)
         self.ui.bio_display.setText(f"Bio: {self.user.bio}")
         self.ui.bio_input.setText("")
+
+    def _upload_profile_picture(self):
+        file_dialog = QFileDialog()
+        file_dialog.setFileMode(QFileDialog.AnyFile)
+        file_path, _ = file_dialog.getOpenFileName()
+
+        if not file_path:  # No file was selected
+            return
+
+        # TODO: validate file, handle errors
+        with open(file_path, mode="rb") as file_handle:
+            profile_picture = Photo.from_file(file_handle, file_path)
+
+        previous_profile_picture = self.user_service.get_profile_picture(self.user)
+        self.user_service.add_profile_picture(self.user, profile_picture)
+
+        if previous_profile_picture is not None:
+            self.user_service.delete_picture(previous_profile_picture)
+
+        self._display_profile_picture()
 
 
 def main(args):
