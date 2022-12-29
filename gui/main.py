@@ -177,15 +177,32 @@ class MessengerPage(QWidget):
 
         self.ui.friends_list.itemClicked.connect(self._select_friend)
         self._display_messages()
+        self._display_firend_info()
 
-    def _display_messages(self):
-        self.ui.messages.setText("")
-
+    def _display_firend_info(self):
         if self.__friend is None:
             self.ui.user_info.setText("Select friend to chat with")
+            self.ui.friend_bio.clear()
+            self.ui.friend_profile_picture.clear()
             return
 
-        self.ui.user_info.setText(f"Chat with {self.__friend.username}")
+        chat_header = f"Chat with {self.__friend.username}"
+        self.ui.user_info.setText(chat_header)
+
+        friend_bio = self.__friend.bio if self.__friend.bio else ""
+        self.ui.friend_bio.setText(friend_bio)
+
+        friend_profile_picture = self.user_service.get_profile_picture(self.__friend)
+        if friend_profile_picture is not None:
+            pixmap = QPixmap()
+            pixmap.loadFromData(QByteArray(friend_profile_picture.get_bytes()))
+            self.ui.friend_profile_picture.setPixmap(pixmap)
+
+    def _display_messages(self):
+        self.ui.messages.clear()
+        if self.__friend is None:
+            return
+
         messages = self.user_service.get_messages(self.__user, self.__friend)
         annotated_messages = []
         for message in messages:
@@ -202,6 +219,7 @@ class MessengerPage(QWidget):
     def _select_friend(self, item: QListWidgetItem):
         self.__friend = item.user
         self._display_messages()
+        self._display_firend_info()
 
     def _send_message(self):
         text = self.ui.message_input.text()
