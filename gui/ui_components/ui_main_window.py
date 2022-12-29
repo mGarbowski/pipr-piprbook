@@ -13,14 +13,14 @@ from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 
 
-class Ui_main_window(object):
-    def setupUi(self, main_window):
-        if not main_window.objectName():
-            main_window.setObjectName(u"main_window")
-        main_window.resize(800, 600)
-        self.action_log_out = QAction(main_window)
+class Ui_MainWindow(object):
+    def setupUi(self, MainWindow):
+        if not MainWindow.objectName():
+            MainWindow.setObjectName(u"MainWindow")
+        MainWindow.resize(800, 600)
+        self.action_log_out = QAction(MainWindow)
         self.action_log_out.setObjectName(u"action_log_out")
-        self.centralwidget = QWidget(main_window)
+        self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalLayout = QHBoxLayout(self.centralwidget)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
@@ -29,31 +29,31 @@ class Ui_main_window(object):
 
         self.horizontalLayout.addWidget(self.tabs)
 
-        main_window.setCentralWidget(self.centralwidget)
-        self.menubar = QMenuBar(main_window)
+        MainWindow.setCentralWidget(self.centralwidget)
+        self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
         self.menubar.setGeometry(QRect(0, 0, 800, 20))
         self.menuOptions = QMenu(self.menubar)
         self.menuOptions.setObjectName(u"menuOptions")
-        main_window.setMenuBar(self.menubar)
-        self.statusbar = QStatusBar(main_window)
+        MainWindow.setMenuBar(self.menubar)
+        self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
-        main_window.setStatusBar(self.statusbar)
+        MainWindow.setStatusBar(self.statusbar)
 
         self.menubar.addAction(self.menuOptions.menuAction())
         self.menuOptions.addAction(self.action_log_out)
 
-        self.retranslateUi(main_window)
+        self.retranslateUi(MainWindow)
 
         self.tabs.setCurrentIndex(-1)
 
 
-        QMetaObject.connectSlotsByName(main_window)
+        QMetaObject.connectSlotsByName(MainWindow)
     # setupUi
 
-    def retranslateUi(self, main_window):
-        main_window.setWindowTitle(QCoreApplication.translate("main_window", u"PIPRbook", None))
-        self.action_log_out.setText(QCoreApplication.translate("main_window", u"Log out", None))
-        self.menuOptions.setTitle(QCoreApplication.translate("main_window", u"Options", None))
+    def retranslateUi(self, MainWindow):
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"PIPRbook", None))
+        self.action_log_out.setText(QCoreApplication.translate("MainWindow", u"Log out", None))
+        self.menuOptions.setTitle(QCoreApplication.translate("MainWindow", u"Options", None))
     # retranslateUi
 

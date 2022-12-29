@@ -10,9 +10,9 @@ from core.model import Photo
 from core.user_service import UserService, UsernameTakenException, EmailAlreadyUsedException, RegistrationException
 from gui.resources.resources import get_placeholder_picture
 from gui.ui_components.ui_invite_friends_page import Ui_InviteFriendsPage
-from gui.ui_components.ui_login_window import Ui_login_window
-from gui.ui_components.ui_main_window import Ui_main_window
-from gui.ui_components.ui_messenger_page import Ui_messenger_page
+from gui.ui_components.ui_login_window import Ui_LoginWindow
+from gui.ui_components.ui_main_window import Ui_MainWindow
+from gui.ui_components.ui_messenger_page import Ui_MessengerPage
 from gui.ui_components.ui_profile_page import Ui_ProfilePage
 
 
@@ -25,7 +25,7 @@ class LoginWindowPages(Enum):
 class LoginWindow(QMainWindow):
     def __init__(self, user_service: UserService, parent=None):
         super().__init__(parent)
-        self.ui = Ui_login_window()
+        self.ui = Ui_LoginWindow()
         self.ui.setupUi(self)
         self.user_service = user_service
 
@@ -158,7 +158,7 @@ class ProfilePage(QWidget):
 class MessengerPage(QWidget):
     def __init__(self, user_service: UserService, parent=None):
         super().__init__(parent)
-        self.ui = Ui_messenger_page()
+        self.ui = Ui_MessengerPage()
         self.ui.setupUi(self)
         self.user_service = user_service
         self.__friend = None
@@ -299,7 +299,7 @@ class MainWindow(QMainWindow):
     def __init__(self, user_service: UserService, parent=None):
         super().__init__(parent)
 
-        self.ui = Ui_main_window()
+        self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
         self.user_service = user_service

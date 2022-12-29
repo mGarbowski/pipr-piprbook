@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>login_window</class>
- <widget class="QMainWindow" name="login_window">
+ <class>LoginWindow</class>
+ <widget class="QMainWindow" name="LoginWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -18,7 +18,7 @@
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="login_page">
        <layout class="QVBoxLayout" name="verticalLayout">
@@ -262,34 +262,6 @@
          </widget>
         </item>
        </layout>
-      </widget>
-      <widget class="QWidget" name="home_page">
-       <widget class="QLabel" name="home_page_label">
-        <property name="geometry">
-         <rect>
-          <x>330</x>
-          <y>30</y>
-          <width>59</width>
-          <height>15</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Home</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="go_button">
-        <property name="geometry">
-         <rect>
-          <x>310</x>
-          <y>110</y>
-          <width>80</width>
-          <height>23</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Go</string>
-        </property>
-       </widget>
       </widget>
      </widget>
     </item>
