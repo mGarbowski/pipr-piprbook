@@ -106,6 +106,9 @@ class ProfilePage(QWidget):
 
         self._setup_profile_page()
 
+    def refresh(self):
+        self._setup_profile_page()
+
     def _setup_profile_page(self):
         user = self.user_service.get_current_user()
 
@@ -168,7 +171,12 @@ class MessengerPage(QWidget):
         self._setup_friends_list()
         self.ui.send_button.clicked.connect(self._send_message)
 
+    def refresh(self):
+        self._setup_friends_list()
+
     def _setup_friends_list(self):
+        self.ui.friends_list.clear()
+
         user = self.user_service.get_current_user()
         friends = self.user_service.get_friends(user)
         for friend in friends:
@@ -240,7 +248,6 @@ class MessengerPage(QWidget):
 
 
 class InviteFriendsPage(QWidget):
-    # TODO: Update Messenger page after adding friend
 
     def __init__(self, user_service: UserService, parent=None):
         super().__init__(parent)
@@ -256,6 +263,9 @@ class InviteFriendsPage(QWidget):
         self._setup_event_handles()
         self._display_sent_invitations()
         self._display_awaiting_invitations()
+
+    def refresh(self):
+        pass
 
     def _setup_event_handles(self):
         self.ui.search_button.clicked.connect(self._search_users)
@@ -367,12 +377,26 @@ class MainWindow(QMainWindow):
     def _setup_main_window(self):
         self.ui.action_log_out.triggered.connect(self._log_out)
 
-        self.tab_indices = {
-            "Profile": self.ui.tabs.addTab(ProfilePage(self.user_service), "Profile"),
-            "Messenger": self.ui.tabs.addTab(MessengerPage(self.user_service), "Messenger"),
-            "Invite Friends": self.ui.tabs.addTab(InviteFriendsPage(self.user_service), "Invite Friends")
+        self.__profile_tab = ProfilePage(self.user_service)
+        self.__messenger_tab = MessengerPage(self.user_service)
+        self.__invite_friends_tab = InviteFriendsPage(self.user_service)
+
+        self.__tab_index_by_name = {
+            "Profile": self.ui.tabs.addTab(self.__profile_tab, "Profile"),
+            "Messenger": self.ui.tabs.addTab(self.__messenger_tab, "Messenger"),
+            "Invite Friends": self.ui.tabs.addTab(self.__invite_friends_tab, "Invite Friends")
         }
-        self.ui.tabs.setCurrentIndex(self.tab_indices["Profile"])
+        self.__tab_by_index = {
+            self.__tab_index_by_name["Profile"]: self.__profile_tab,
+            self.__tab_index_by_name["Messenger"]: self.__messenger_tab,
+            self.__tab_index_by_name["Invite Friends"]: self.__invite_friends_tab,
+        }
+
+        self.ui.tabs.setCurrentIndex(self.__tab_index_by_name["Profile"])
+        self.ui.tabs.currentChanged.connect(self._refresh_tab)
+
+    def _refresh_tab(self, tab_index):
+        self.__tab_by_index[tab_index].refresh()
 
     def _log_out(self):
         self.user_service.log_out_user()
