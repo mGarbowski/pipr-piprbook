@@ -21,6 +21,9 @@ class User:
     profile_picture_id: Optional[str] = None
     bio: Optional[str] = None
 
+    def is_friends_with(self, user: 'User') -> bool:
+        return user.uuid in self.friend_uuids
+
 
 @dataclass
 class Message:

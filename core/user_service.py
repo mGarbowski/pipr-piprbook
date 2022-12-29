@@ -36,6 +36,12 @@ class UserService:
     def log_out_user(self):
         self.__authentication.log_out()
 
+    def get_user_by_id(self, user_id: str) -> Optional[User]:
+        return self.__user_repository.get_by_id(user_id)
+
+    def get_users_by_username_fragment(self, username_fragment: str) -> List[User]:
+        return self.__user_repository.get_by_username_fragment(username_fragment)
+
     def register_new_user(self, username: str, email: str, password: str) -> None:
         """Attempt to register new user with given credentials"""
         if self.__user_repository.get_by_username(username) is not None:
@@ -97,6 +103,14 @@ class UserService:
             )
         )
 
+    def get_friend_requests_from(self, user: User) -> List[FriendRequest]:
+        self._check_if_logged_in(user)
+        return self.__friend_request_repository.get_requests_from_user(user)
+
+    def get_friend_requests_to(self, user: User) -> List[FriendRequest]:
+        self._check_if_logged_in(user)
+        return self.__friend_request_repository.get_requests_to_user(user)
+
     def send_friend_request(self, from_user: User, to_user: User) -> FriendRequest:
         self._check_if_logged_in(from_user)
         return self.__friend_request_repository.save(
@@ -124,6 +138,9 @@ class UserService:
 
         self.__user_repository.save(to_user)
         self.__user_repository.save(from_user)
+        self.__friend_request_repository.delete(friend_request)
+
+    def delete_friend_request(self, friend_request: FriendRequest) -> None:
         self.__friend_request_repository.delete(friend_request)
 
     def get_messages(self, user_a: User, user_b: User) -> List[Message]:

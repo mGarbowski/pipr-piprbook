@@ -60,6 +60,9 @@ class Ui_main_window(object):
         self.pushButton = QPushButton(self.profile_page)
         self.pushButton.setObjectName(u"pushButton")
         self.pushButton.setGeometry(QRect(300, 500, 80, 23))
+        self.pushButton_2 = QPushButton(self.profile_page)
+        self.pushButton_2.setObjectName(u"pushButton_2")
+        self.pushButton_2.setGeometry(QRect(450, 500, 80, 23))
         self.pages.addWidget(self.profile_page)
 
         self.horizontalLayout.addWidget(self.pages)
@@ -98,6 +101,7 @@ class Ui_main_window(object):
         self.update_bio_button.setText(QCoreApplication.translate("main_window", u"Update bio", None))
         self.upload_profile_picture_button.setText(QCoreApplication.translate("main_window", u"Upload profile picture", None))
         self.pushButton.setText(QCoreApplication.translate("main_window", u"PushButton", None))
+        self.pushButton_2.setText(QCoreApplication.translate("main_window", u"PushButton", None))
         self.menuOptions.setTitle(QCoreApplication.translate("main_window", u"Options", None))
     # retranslateUi
 

@@ -9,6 +9,7 @@ from core.factory import get_user_service_default
 from core.model import Photo
 from core.user_service import UserService, UsernameTakenException, EmailAlreadyUsedException, RegistrationException
 from gui.resources.resources import get_placeholder_picture
+from gui.ui_invite_friends_page import Ui_InviteFriendsPage
 from gui.ui_login_window import Ui_login_window
 from gui.ui_main_window import Ui_main_window
 from gui.ui_messenger_page import Ui_messenger_page
@@ -157,6 +158,83 @@ class MessengerPage(QWidget):
         self._display_messages()
 
 
+class InviteFriendsPage(QWidget):
+    # TODO: fix display of search result after accepting / ignoring invitation
+    def __init__(self, user_service: UserService, parent=None):
+        super().__init__(parent)
+        self.ui = Ui_InviteFriendsPage()
+        self.ui.setupUi(self)
+        self.user_service = user_service
+        self.__user = self.user_service.get_current_user()
+        self.__selected_user = None
+        self.__selected_invitation = None
+
+        self._display_sent_invitations()
+        self._display_awaiting_invitations()
+        self.ui.search_button.clicked.connect(self._search_users)
+        self.ui.search_result.itemClicked.connect(self._select_user)
+        self.ui.invite_button.clicked.connect(self._invite_selected_user)
+        self.ui.accept_button.clicked.connect(self._accept_selected_invitaiton)
+        self.ui.ignore_button.clicked.connect(self._ignore_selected_invitation)
+        self.ui.awaiting_invitations.itemClicked.connect(self._select_invitation)
+
+    def _select_user(self, item: QListWidgetItem):
+        self.__selected_user = item.user
+
+    def _display_sent_invitations(self):
+        sent_invitations = self.user_service.get_friend_requests_from(self.__user)
+        for invitation in sent_invitations:
+            to_user = self.user_service.get_user_by_id(invitation.to_user_id)
+            item = QListWidgetItem(to_user.username)
+            item.invitation = invitation
+            self.ui.sent_invitations.addItem(item)
+
+    def _display_awaiting_invitations(self):
+        self.ui.awaiting_invitations.clear()
+        awaiting_invitations = self.user_service.get_friend_requests_to(self.__user)
+        for invitation in awaiting_invitations:
+            from_user = self.user_service.get_user_by_id(invitation.from_user_id)
+            item = QListWidgetItem(from_user.username)
+            item.invitation = invitation
+            self.ui.awaiting_invitations.addItem(item)
+
+    def _select_invitation(self, item: QListWidgetItem):
+        self.__selected_invitation = item.invitation
+
+    def _accept_selected_invitaiton(self):
+        self.user_service.accept_friend_request(self.__selected_invitation)
+        self._display_awaiting_invitations()
+
+    def _ignore_selected_invitation(self):
+        self.user_service.delete_friend_request(self.__selected_invitation)
+        self._display_awaiting_invitations()
+
+    def _search_users(self):
+        self.ui.search_result.clear()
+
+        username_fragment = self.ui.search_bar.text()
+        sent_invitations = self.user_service.get_friend_requests_from(self.__user)
+        invited_user_ids = [invitation.to_user_id for invitation in sent_invitations]
+
+        users = self.user_service.get_users_by_username_fragment(username_fragment)
+        users = [user for user in users if user != self.__user]
+        users = [user for user in users if not self.__user.is_friends_with(user)]
+        users = [user for user in users if user.uuid not in invited_user_ids]
+
+        for user in users:
+            item = QListWidgetItem(user.username)
+            item.user = user
+            self.ui.search_result.addItem(item)
+
+    def _invite_selected_user(self):
+        if self.__selected_user is None:
+            return
+
+        self.user_service.send_friend_request(self.__user, self.__selected_user)
+        self._search_users()
+        self._display_sent_invitations()
+
+
 class MainWindowPage(Enum):
     PROFILE = 0
     MESSENGER = 1
@@ -176,7 +254,9 @@ class MainWindow(QMainWindow):
         self._setup_profile_page()
 
         self.ui.pages.addWidget(MessengerPage(self.user_service))
+        self.ui.pages.addWidget(InviteFriendsPage(self.user_service))
         self.ui.pushButton.clicked.connect(lambda: self.ui.pages.setCurrentIndex(MainWindowPage.MESSENGER.value))
+        self.ui.pushButton_2.clicked.connect(lambda: self.ui.pages.setCurrentIndex(MainWindowPage.INVITE_FRIENDS.value))
 
     def _setup_profile_page(self):
         user = self.user

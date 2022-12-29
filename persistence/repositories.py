@@ -37,6 +37,12 @@ class UserRepository:
         users = [user for user in users if user.email == email]
         return users[0] if users else None
 
+    def get_by_username_fragment(self, username_fragment: str):
+        return [
+            user for user in self.get_all()
+            if username_fragment in user.username
+        ]
+
 
 class MessageRepository:
     def __init__(self, database: Database, serializer: JsonSerializer[Message],
