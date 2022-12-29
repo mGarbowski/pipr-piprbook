@@ -295,26 +295,27 @@ class InviteFriendsPage(QWidget):
         self._display_sent_invitations()
 
 
-class MainWindowPages(Enum):
-    PROFILE = 0
-    MESSENGER = 1
-    INVITE_FRIENDS = 2
-
-
 class MainWindow(QMainWindow):
     def __init__(self, user_service: UserService, parent=None):
         super().__init__(parent)
+
         self.ui = Ui_main_window()
         self.ui.setupUi(self)
+
         self.user_service = user_service
         self.user = self.user_service.get_current_user()
 
+        self._setup_main_window()
+
+    def _setup_main_window(self):
         self.ui.action_log_out.triggered.connect(self._log_out)
 
-        profile_tab_idx = self.ui.tabs.addTab(ProfilePage(self.user_service), "Profile")
-        self.ui.tabs.addTab(MessengerPage(self.user_service), "Messenger")
-        self.ui.tabs.addTab(InviteFriendsPage(self.user_service), "Invite Friends")
-        self.ui.tabs.setCurrentIndex(profile_tab_idx)
+        self.tab_indices = {
+            "Profile": self.ui.tabs.addTab(ProfilePage(self.user_service), "Profile"),
+            "Messenger": self.ui.tabs.addTab(MessengerPage(self.user_service), "Messenger"),
+            "Invite Friends": self.ui.tabs.addTab(InviteFriendsPage(self.user_service), "Invite Friends")
+        }
+        self.ui.tabs.setCurrentIndex(self.tab_indices["Profile"])
 
     def _log_out(self):
         self.user_service.log_out_user()
