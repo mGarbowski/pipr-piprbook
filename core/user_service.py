@@ -79,6 +79,12 @@ class UserService:
     def delete_picture(self, photo: Photo):
         self.__photo_repository.delete(photo)
 
+    def get_friends(self, user: User) -> List[User]:
+        return [
+            self.__user_repository.get_by_id(friend_id)
+            for friend_id in user.friend_uuids
+        ]
+
     def send_message(self, from_user: User, to_user: User, text: str) -> Message:
         self._check_if_logged_in(from_user)
         return self.__message_repository.save(
@@ -120,12 +126,12 @@ class UserService:
         self.__user_repository.save(from_user)
         self.__friend_request_repository.delete(friend_request)
 
-    def get_messages(self, user_a: User, user_b: User, count: Optional[int] = None, offset: int = 0) -> List[Message]:
+    def get_messages(self, user_a: User, user_b: User) -> List[Message]:
         current_user = self.__authentication.logged_in_user
         if user_a != current_user and user_b != current_user:
             raise UnauthorizedError()
 
-        return self.__message_repository.get_messages(user_a, user_b, count, offset)
+        return self.__message_repository.get_messages(user_a, user_b)
 
     def _check_if_logged_in(self, user: User) -> None:
         if user.uuid != self.__authentication.logged_in_user.uuid:

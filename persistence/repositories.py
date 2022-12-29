@@ -66,7 +66,7 @@ class MessageRepository:
 
 def _is_message_matched(message: Message, user_a: User, user_b: User) -> bool:
     user_ids = (user_a.uuid, user_b.uuid)
-    return message.to_user_id in user_ids or message.from_user_id in user_ids
+    return message.to_user_id in user_ids and message.from_user_id in user_ids
 
 
 class FriendRequestRepository:

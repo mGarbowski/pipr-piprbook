@@ -17,6 +17,9 @@
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
      <widget class="QStackedWidget" name="pages">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
       <widget class="QWidget" name="profile_page">
        <widget class="QLabel" name="profile_picture_header">
         <property name="geometry">
@@ -138,9 +141,20 @@
          <string>Upload profile picture</string>
         </property>
        </widget>
+       <widget class="QPushButton" name="pushButton">
+        <property name="geometry">
+         <rect>
+          <x>300</x>
+          <y>500</y>
+          <width>80</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>PushButton</string>
+        </property>
+       </widget>
       </widget>
-      <widget class="QWidget" name="messenger_page"/>
-      <widget class="QWidget" name="invite_friends_page"/>
      </widget>
     </item>
    </layout>

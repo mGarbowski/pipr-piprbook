@@ -13,8 +13,8 @@ Użytkownik powinien mieć możliwość:
 * [x] dodania zdjęcia profilowego
 * [x] dodania krótkiej notki na swój temat
 * [ ] zaproszenia innego użytkownika do znajomych
-* [ ] wysłania wiadomości do znajomego
-* [ ] odczytania otrzymanych wiadomości
+* [x] wysłania wiadomości do znajomego
+* [x] odczytania otrzymanych wiadomości
 
 Program musi posiadać warstwę trwałości („baza danych” symulowana poprzez zapis do plików i czytanie z nich).
 

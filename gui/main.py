@@ -3,7 +3,7 @@ from enum import Enum
 
 from PySide2.QtCore import QByteArray
 from PySide2.QtGui import QPixmap
-from PySide2.QtWidgets import QMainWindow, QApplication, QFileDialog
+from PySide2.QtWidgets import QMainWindow, QApplication, QFileDialog, QWidget, QListWidgetItem
 
 from core.factory import get_user_service_default
 from core.model import Photo
@@ -11,6 +11,7 @@ from core.user_service import UserService, UsernameTakenException, EmailAlreadyU
 from gui.resources.resources import get_placeholder_picture
 from gui.ui_login_window import Ui_login_window
 from gui.ui_main_window import Ui_main_window
+from gui.ui_messenger_page import Ui_messenger_page
 
 
 class LoginWindowPage(Enum):
@@ -93,6 +94,69 @@ class LoginWindow(QMainWindow):
         self.hide()
 
 
+class MessengerPage(QWidget):
+    def __init__(self, user_service: UserService, parent=None):
+        super().__init__(parent)
+        self.ui = Ui_messenger_page()
+        self.ui.setupUi(self)
+        self.user_service = user_service
+        self.__friend = None
+        self.__user = user_service.get_current_user()
+
+        self._setup_friends_list()
+        self.ui.send_button.clicked.connect(self._send_message)
+
+    def _setup_friends_list(self):
+        friends = self.user_service.get_friends(self.__user)
+        for friend in friends:
+            item = QListWidgetItem()
+            item.user = friend
+            item.setText(friend.username)
+            self.ui.friends_list.addItem(item)
+
+        self.ui.friends_list.itemClicked.connect(self._select_friend)
+        self._display_messages()
+
+    def _display_messages(self):
+        self.ui.messages.setText("")
+
+        if self.__friend is None:
+            self.ui.user_info.setText("Select friend to chat with")
+            return
+
+        self.ui.user_info.setText(f"Chat with {self.__friend.username}")
+        messages = self.user_service.get_messages(self.__user, self.__friend)
+        annotated_messages = []
+        for message in messages:
+            if message.from_user_id == self.__user.uuid:
+                username = self.__user.username
+            else:
+                username = self.__friend.username
+            message_display_text = f"{username}:\t{message.text}"
+            annotated_messages.append(message_display_text)
+
+        messages_text = "\n".join(annotated_messages)
+        self.ui.messages.setText(messages_text)
+
+    def _select_friend(self, item: QListWidgetItem):
+        self.__friend = item.user
+        self._display_messages()
+
+    def _send_message(self):
+        text = self.ui.message_input.text()
+        self.ui.message_input.clear()
+
+        if self.__friend is None:
+            return
+
+        self.user_service.send_message(
+            from_user=self.__user,
+            to_user=self.__friend,
+            text=text
+        )
+        self._display_messages()
+
+
 class MainWindowPage(Enum):
     PROFILE = 0
     MESSENGER = 1
@@ -110,6 +174,9 @@ class MainWindow(QMainWindow):
         self.ui.pages.setCurrentIndex(MainWindowPage.PROFILE.value)
         self.ui.action_log_out.triggered.connect(self._log_out)
         self._setup_profile_page()
+
+        self.ui.pages.addWidget(MessengerPage(self.user_service))
+        self.ui.pushButton.clicked.connect(lambda: self.ui.pages.setCurrentIndex(MainWindowPage.MESSENGER.value))
 
     def _setup_profile_page(self):
         user = self.user

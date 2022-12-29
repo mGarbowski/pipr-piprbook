@@ -57,13 +57,10 @@ class Ui_main_window(object):
         self.upload_profile_picture_button = QPushButton(self.profile_page)
         self.upload_profile_picture_button.setObjectName(u"upload_profile_picture_button")
         self.upload_profile_picture_button.setGeometry(QRect(440, 410, 151, 23))
+        self.pushButton = QPushButton(self.profile_page)
+        self.pushButton.setObjectName(u"pushButton")
+        self.pushButton.setGeometry(QRect(300, 500, 80, 23))
         self.pages.addWidget(self.profile_page)
-        self.messenger_page = QWidget()
-        self.messenger_page.setObjectName(u"messenger_page")
-        self.pages.addWidget(self.messenger_page)
-        self.invite_friends_page = QWidget()
-        self.invite_friends_page.setObjectName(u"invite_friends_page")
-        self.pages.addWidget(self.invite_friends_page)
 
         self.horizontalLayout.addWidget(self.pages)
 
@@ -83,6 +80,9 @@ class Ui_main_window(object):
 
         self.retranslateUi(main_window)
 
+        self.pages.setCurrentIndex(0)
+
+
         QMetaObject.connectSlotsByName(main_window)
     # setupUi
 
@@ -97,6 +97,7 @@ class Ui_main_window(object):
         self.bio_display.setText(QCoreApplication.translate("main_window", u"Bio display", None))
         self.update_bio_button.setText(QCoreApplication.translate("main_window", u"Update bio", None))
         self.upload_profile_picture_button.setText(QCoreApplication.translate("main_window", u"Upload profile picture", None))
+        self.pushButton.setText(QCoreApplication.translate("main_window", u"PushButton", None))
         self.menuOptions.setTitle(QCoreApplication.translate("main_window", u"Options", None))
     # retranslateUi
 
