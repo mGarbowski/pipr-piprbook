@@ -3,19 +3,20 @@ from enum import Enum
 
 from PySide2.QtCore import QByteArray
 from PySide2.QtGui import QPixmap
-from PySide2.QtWidgets import QMainWindow, QApplication, QFileDialog, QWidget, QListWidgetItem
+from PySide2.QtWidgets import QApplication, QWidget, QFileDialog, QListWidgetItem, QMainWindow
 
 from core.factory import get_user_service_default
 from core.model import Photo
 from core.user_service import UserService, UsernameTakenException, EmailAlreadyUsedException, RegistrationException
 from gui.resources.resources import get_placeholder_picture
-from gui.ui_invite_friends_page import Ui_InviteFriendsPage
-from gui.ui_login_window import Ui_login_window
-from gui.ui_main_window import Ui_main_window
-from gui.ui_messenger_page import Ui_messenger_page
+from gui.ui_components.ui_invite_friends_page import Ui_InviteFriendsPage
+from gui.ui_components.ui_login_window import Ui_login_window
+from gui.ui_components.ui_main_window import Ui_main_window
+from gui.ui_components.ui_messenger_page import Ui_messenger_page
+from gui.ui_components.ui_profile_page import Ui_ProfilePage
 
 
-class LoginWindowPage(Enum):
+class LoginWindowPages(Enum):
     LOGIN = 0
     REGISTER = 1
     HOME = 2
@@ -28,14 +29,14 @@ class LoginWindow(QMainWindow):
         self.ui.setupUi(self)
         self.user_service = user_service
 
-        self.ui.stackedWidget.setCurrentIndex(LoginWindowPage.LOGIN.value)
+        self.ui.stackedWidget.setCurrentIndex(LoginWindowPages.LOGIN.value)
         self._setup_login_page()
         self._setup_register_page()
 
     def _setup_login_page(self):
         self.ui.log_in_button.clicked.connect(self._log_in_user)
         self.ui.register_button.clicked.connect(
-            lambda: self.ui.stackedWidget.setCurrentIndex(LoginWindowPage.REGISTER.value)
+            lambda: self.ui.stackedWidget.setCurrentIndex(LoginWindowPages.REGISTER.value)
         )
         self.ui.login_failed_text.setText("")
 
@@ -54,7 +55,7 @@ class LoginWindow(QMainWindow):
         self.ui.create_account_button.clicked.connect(self._register_user)
         self._clear_registration_form()
         self.ui.back_to_login_button.clicked.connect(
-            lambda: self.ui.stackedWidget.setCurrentIndex(LoginWindowPage.LOGIN.value)
+            lambda: self.ui.stackedWidget.setCurrentIndex(LoginWindowPages.LOGIN.value)
         )
 
     def _register_user(self):
@@ -70,7 +71,7 @@ class LoginWindow(QMainWindow):
 
         try:
             self.user_service.register_new_user(username, email, password)
-            self.ui.stackedWidget.setCurrentIndex(LoginWindowPage.LOGIN.value)
+            self.ui.stackedWidget.setCurrentIndex(LoginWindowPages.LOGIN.value)
             self._clear_registration_form()
         except UsernameTakenException:
             self._clear_registration_form()
@@ -93,6 +94,65 @@ class LoginWindow(QMainWindow):
         self.main_window = MainWindow(self.user_service)
         self.main_window.show()
         self.hide()
+
+
+class ProfilePage(QWidget):
+
+    def __init__(self, user_service: UserService, parent=None):
+        super().__init__(parent)
+        self.user_service = user_service
+        self.user = self.user_service.get_current_user()
+        self.ui = Ui_ProfilePage()
+        self.ui.setupUi(self)
+
+        self._setup_profile_page()
+
+    def _setup_profile_page(self):
+        user = self.user
+
+        self.ui.profile_header.setText(f"{user.username}'s profile")
+        self.ui.username_display.setText(f"Username: {user.username}")
+        self.ui.email_display.setText(f"Email address: {user.email}")
+        self.ui.bio_display.setText(f"Bio: {user.bio}" if user.bio else "No bio set")
+
+        self._display_profile_picture()
+
+        self.ui.update_bio_button.clicked.connect(self._update_user_bio)
+        self.ui.upload_profile_picture_button.clicked.connect(self._upload_profile_picture)
+
+    def _upload_profile_picture(self):
+        file_dialog = QFileDialog()
+        file_dialog.setFileMode(QFileDialog.AnyFile)
+        file_path, _ = file_dialog.getOpenFileName()
+
+        if not file_path:  # No file was selected
+            return
+
+        # TODO: validate file, handle errors
+        with open(file_path, mode="rb") as file_handle:
+            profile_picture = Photo.from_file(file_handle, file_path)
+
+        previous_profile_picture = self.user_service.get_profile_picture(self.user)
+        self.user_service.add_profile_picture(self.user, profile_picture)
+
+        if previous_profile_picture is not None:
+            self.user_service.delete_picture(previous_profile_picture)
+
+        self._display_profile_picture()
+
+    def _update_user_bio(self):
+        bio = self.ui.bio_input.toPlainText()
+        self.user_service.set_bio(self.user, bio)
+        self.ui.bio_display.setText(f"Bio: {self.user.bio}")
+        self.ui.bio_input.setText("")
+
+    def _display_profile_picture(self):
+        profile_picture = self.user_service.get_profile_picture(self.user)
+        profile_picture_bytes = profile_picture.get_bytes() if profile_picture else get_placeholder_picture()
+
+        pixmap = QPixmap()
+        pixmap.loadFromData(QByteArray(profile_picture_bytes))
+        self.ui.profile_picture.setPixmap(pixmap)
 
 
 class MessengerPage(QWidget):
@@ -235,7 +295,7 @@ class InviteFriendsPage(QWidget):
         self._display_sent_invitations()
 
 
-class MainWindowPage(Enum):
+class MainWindowPages(Enum):
     PROFILE = 0
     MESSENGER = 1
     INVITE_FRIENDS = 2
@@ -249,67 +309,18 @@ class MainWindow(QMainWindow):
         self.user_service = user_service
         self.user = self.user_service.get_current_user()
 
-        self.ui.pages.setCurrentIndex(MainWindowPage.PROFILE.value)
         self.ui.action_log_out.triggered.connect(self._log_out)
-        self._setup_profile_page()
 
-        self.ui.pages.addWidget(MessengerPage(self.user_service))
-        self.ui.pages.addWidget(InviteFriendsPage(self.user_service))
-        self.ui.pushButton.clicked.connect(lambda: self.ui.pages.setCurrentIndex(MainWindowPage.MESSENGER.value))
-        self.ui.pushButton_2.clicked.connect(lambda: self.ui.pages.setCurrentIndex(MainWindowPage.INVITE_FRIENDS.value))
-
-    def _setup_profile_page(self):
-        user = self.user
-
-        self.ui.profile_header.setText(f"{user.username}'s profile")
-        self.ui.username_display.setText(f"Username: {user.username}")
-        self.ui.email_display.setText(f"Email address: {user.email}")
-        self.ui.bio_display.setText(f"Bio: {user.bio}" if user.bio else "No bio set")
-
-        self._display_profile_picture()
-
-        self.ui.update_bio_button.clicked.connect(self._update_user_bio)
-        self.ui.upload_profile_picture_button.clicked.connect(self._upload_profile_picture)
-
-    def _display_profile_picture(self):
-        profile_picture = self.user_service.get_profile_picture(self.user)
-        profile_picture_bytes = profile_picture.get_bytes() if profile_picture else get_placeholder_picture()
-
-        pixmap = QPixmap()
-        pixmap.loadFromData(QByteArray(profile_picture_bytes))
-        self.ui.profile_picture.setPixmap(pixmap)
+        profile_tab_idx = self.ui.tabs.addTab(ProfilePage(self.user_service), "Profile")
+        self.ui.tabs.addTab(MessengerPage(self.user_service), "Messenger")
+        self.ui.tabs.addTab(InviteFriendsPage(self.user_service), "Invite Friends")
+        self.ui.tabs.setCurrentIndex(profile_tab_idx)
 
     def _log_out(self):
         self.user_service.log_out_user()
         self.login_window = LoginWindow(self.user_service)
         self.login_window.show()
         self.hide()
-
-    def _update_user_bio(self):
-        bio = self.ui.bio_input.toPlainText()
-        self.user_service.set_bio(self.user, bio)
-        self.ui.bio_display.setText(f"Bio: {self.user.bio}")
-        self.ui.bio_input.setText("")
-
-    def _upload_profile_picture(self):
-        file_dialog = QFileDialog()
-        file_dialog.setFileMode(QFileDialog.AnyFile)
-        file_path, _ = file_dialog.getOpenFileName()
-
-        if not file_path:  # No file was selected
-            return
-
-        # TODO: validate file, handle errors
-        with open(file_path, mode="rb") as file_handle:
-            profile_picture = Photo.from_file(file_handle, file_path)
-
-        previous_profile_picture = self.user_service.get_profile_picture(self.user)
-        self.user_service.add_profile_picture(self.user, profile_picture)
-
-        if previous_profile_picture is not None:
-            self.user_service.delete_picture(previous_profile_picture)
-
-        self._display_profile_picture()
 
 
 def main(args):
