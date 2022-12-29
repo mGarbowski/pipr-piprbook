@@ -101,14 +101,13 @@ class ProfilePage(QWidget):
     def __init__(self, user_service: UserService, parent=None):
         super().__init__(parent)
         self.user_service = user_service
-        self.user = self.user_service.get_current_user()
         self.ui = Ui_ProfilePage()
         self.ui.setupUi(self)
 
         self._setup_profile_page()
 
     def _setup_profile_page(self):
-        user = self.user
+        user = self.user_service.get_current_user()
 
         self.ui.profile_header.setText(f"{user.username}'s profile")
         self.ui.username_display.setText(f"Username: {user.username}")
@@ -132,8 +131,9 @@ class ProfilePage(QWidget):
         with open(file_path, mode="rb") as file_handle:
             profile_picture = Photo.from_file(file_handle, file_path)
 
-        previous_profile_picture = self.user_service.get_profile_picture(self.user)
-        self.user_service.add_profile_picture(self.user, profile_picture)
+        user = self.user_service.get_current_user()
+        previous_profile_picture = self.user_service.get_profile_picture(user)
+        self.user_service.add_profile_picture(user, profile_picture)
 
         if previous_profile_picture is not None:
             self.user_service.delete_picture(previous_profile_picture)
@@ -141,13 +141,15 @@ class ProfilePage(QWidget):
         self._display_profile_picture()
 
     def _update_user_bio(self):
+        user = self.user_service.get_current_user()
         bio = self.ui.bio_input.toPlainText()
-        self.user_service.set_bio(self.user, bio)
-        self.ui.bio_display.setText(f"Bio: {self.user.bio}")
+        self.user_service.set_bio(user, bio)
+        self.ui.bio_display.setText(f"Bio: {user.bio}")
         self.ui.bio_input.setText("")
 
     def _display_profile_picture(self):
-        profile_picture = self.user_service.get_profile_picture(self.user)
+        user = self.user_service.get_current_user()
+        profile_picture = self.user_service.get_profile_picture(user)
         profile_picture_bytes = profile_picture.get_bytes() if profile_picture else get_placeholder_picture()
 
         pixmap = QPixmap()
@@ -162,13 +164,13 @@ class MessengerPage(QWidget):
         self.ui.setupUi(self)
         self.user_service = user_service
         self.__friend = None
-        self.__user = user_service.get_current_user()
 
         self._setup_friends_list()
         self.ui.send_button.clicked.connect(self._send_message)
 
     def _setup_friends_list(self):
-        friends = self.user_service.get_friends(self.__user)
+        user = self.user_service.get_current_user()
+        friends = self.user_service.get_friends(user)
         for friend in friends:
             item = QListWidgetItem()
             item.user = friend
@@ -203,11 +205,12 @@ class MessengerPage(QWidget):
         if self.__friend is None:
             return
 
-        messages = self.user_service.get_messages(self.__user, self.__friend)
+        user = self.user_service.get_current_user()
+        messages = self.user_service.get_messages(user, self.__friend)
         annotated_messages = []
         for message in messages:
-            if message.from_user_id == self.__user.uuid:
-                username = self.__user.username
+            if message.from_user_id == user.uuid:
+                username = user.username
             else:
                 username = self.__friend.username
             message_display_text = f"{username}:\t{message.text}"
@@ -229,7 +232,7 @@ class MessengerPage(QWidget):
             return
 
         self.user_service.send_message(
-            from_user=self.__user,
+            from_user=self.user_service.get_current_user(),
             to_user=self.__friend,
             text=text
         )
@@ -237,6 +240,7 @@ class MessengerPage(QWidget):
 
 
 class InviteFriendsPage(QWidget):
+    # TODO: Update Messenger page after adding friend
 
     def __init__(self, user_service: UserService, parent=None):
         super().__init__(parent)
@@ -245,7 +249,6 @@ class InviteFriendsPage(QWidget):
         self.ui.setupUi(self)
 
         self.user_service = user_service
-        self.__user = self.user_service.get_current_user()
         self.__selected_user = None
         self.__awaiting_invitation = None
         self.__sent_invitation = None
@@ -271,15 +274,16 @@ class InviteFriendsPage(QWidget):
     def _search_users(self):
         self.ui.search_result.clear()
 
+        current_user = self.user_service.get_current_user()
         username_fragment = self.ui.search_bar.text()
-        sent_invitations = self.user_service.get_friend_requests_from(self.__user)
+        sent_invitations = self.user_service.get_friend_requests_from(current_user)
         invited_user_ids = [invitation.to_user_id for invitation in sent_invitations]
-        awaiting_invitations = self.user_service.get_friend_requests_to(self.__user)
+        awaiting_invitations = self.user_service.get_friend_requests_to(current_user)
         already_invited_by_ids = [invitation.from_user_id for invitation in awaiting_invitations]
 
         users = self.user_service.get_users_by_username_fragment(username_fragment)
-        users = [user for user in users if user.uuid != self.__user.uuid]
-        users = [user for user in users if not self.__user.is_friends_with(user)]
+        users = [user for user in users if user.uuid != current_user.uuid]
+        users = [user for user in users if not current_user.is_friends_with(user)]
         users = [user for user in users if user.uuid not in invited_user_ids]
         users = [user for user in users if user.uuid not in already_invited_by_ids]
 
@@ -292,7 +296,8 @@ class InviteFriendsPage(QWidget):
         if self.__selected_user is None:
             return
 
-        self.user_service.send_friend_request(self.__user, self.__selected_user)
+        current_user = self.user_service.get_current_user()
+        self.user_service.send_friend_request(current_user, self.__selected_user)
         self._search_users()
         self._display_sent_invitations()
 
@@ -301,7 +306,9 @@ class InviteFriendsPage(QWidget):
 
     def _display_awaiting_invitations(self):
         self.ui.awaiting_invitations.clear()
-        awaiting_invitations = self.user_service.get_friend_requests_to(self.__user)
+
+        current_user = self.user_service.get_current_user()
+        awaiting_invitations = self.user_service.get_friend_requests_to(current_user)
         for invitation in awaiting_invitations:
             from_user = self.user_service.get_user_by_id(invitation.from_user_id)
             item = QListWidgetItem(from_user.username)
@@ -313,7 +320,6 @@ class InviteFriendsPage(QWidget):
             return
 
         self.user_service.accept_friend_request(self.__awaiting_invitation)
-        self.__user = self.user_service.refresh_user_data(self.__user)  # Udpate friend info
         self._display_awaiting_invitations()
         self._search_users()
 
@@ -330,7 +336,8 @@ class InviteFriendsPage(QWidget):
 
     def _display_sent_invitations(self):
         self.ui.sent_invitations.clear()
-        sent_invitations = self.user_service.get_friend_requests_from(self.__user)
+        current_user = self.user_service.get_current_user()
+        sent_invitations = self.user_service.get_friend_requests_from(current_user)
         for invitation in sent_invitations:
             to_user = self.user_service.get_user_by_id(invitation.to_user_id)
             list_item = QListWidgetItem(to_user.username)

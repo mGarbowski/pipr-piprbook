@@ -63,9 +63,11 @@ class UserService:
         self.save_user(user)
 
     def get_current_user(self) -> User:
-        return self.__authentication.logged_in_user
+        return self._refresh_user_data(
+            self.__authentication.logged_in_user
+        )
 
-    def refresh_user_data(self, user: User) -> User:
+    def _refresh_user_data(self, user: User) -> User:
         """Return the same user from the database, with his current state"""
         return self.get_user_by_id(user.uuid)
 
@@ -149,7 +151,7 @@ class UserService:
 
     def get_messages(self, user_a: User, user_b: User) -> List[Message]:
         current_user = self.__authentication.logged_in_user
-        if user_a != current_user and user_b != current_user:
+        if user_a.uuid != current_user.uuid and user_b.uuid != current_user.uuid:
             raise UnauthorizedError()
 
         return self.__message_repository.get_messages(user_a, user_b)
