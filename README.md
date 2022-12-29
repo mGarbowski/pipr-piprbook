@@ -24,12 +24,18 @@ Projekt testowany na wersji Pythona 3.8.10
 
 W wersji 3.11 pojawiają się problemy z kompatybilnością z PySide2
 
+W katalogu projektu
+```bash
+python -m gui.main {ścieżka do pliku z bazą danych}
+```
+
 ### Zainstalowanie zależności
 ```bash
 pip install -r requirements.txt
 ```
 
-W katalogu projektu
+### Wygenerowanie klas do obsługi widgetów
 ```bash
-python -m gui.main {ścieżka do pliku z bazą danych}
+./generate_components.sh
 ```
+
