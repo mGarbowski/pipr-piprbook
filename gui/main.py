@@ -237,55 +237,36 @@ class MessengerPage(QWidget):
 
 
 class InviteFriendsPage(QWidget):
-    # TODO: fix display of search result after accepting / ignoring invitation
+
     def __init__(self, user_service: UserService, parent=None):
         super().__init__(parent)
+
         self.ui = Ui_InviteFriendsPage()
         self.ui.setupUi(self)
+
         self.user_service = user_service
         self.__user = self.user_service.get_current_user()
         self.__selected_user = None
-        self.__selected_invitation = None
+        self.__awaiting_invitation = None
+        self.__sent_invitation = None
 
+        self._setup_event_handles()
         self._display_sent_invitations()
         self._display_awaiting_invitations()
+
+    def _setup_event_handles(self):
         self.ui.search_button.clicked.connect(self._search_users)
-        self.ui.search_result.itemClicked.connect(self._select_user)
         self.ui.invite_button.clicked.connect(self._invite_selected_user)
-        self.ui.accept_button.clicked.connect(self._accept_selected_invitaiton)
-        self.ui.ignore_button.clicked.connect(self._ignore_selected_invitation)
-        self.ui.awaiting_invitations.itemClicked.connect(self._select_invitation)
+        self.ui.accept_button.clicked.connect(self._accept_awaiting_invitaiton)
+        self.ui.ignore_button.clicked.connect(self._ignore_awaiting_invitation)
+        self.ui.cancel_button.clicked.connect(self._cancel_sent_invitation)
+
+        self.ui.search_result.itemClicked.connect(self._select_user)
+        self.ui.awaiting_invitations.itemClicked.connect(self._select_awaiting_invitation)
+        self.ui.sent_invitations.itemClicked.connect(self._select_sent_invitation)
 
     def _select_user(self, item: QListWidgetItem):
         self.__selected_user = item.user
-
-    def _display_sent_invitations(self):
-        sent_invitations = self.user_service.get_friend_requests_from(self.__user)
-        for invitation in sent_invitations:
-            to_user = self.user_service.get_user_by_id(invitation.to_user_id)
-            item = QListWidgetItem(to_user.username)
-            item.invitation = invitation
-            self.ui.sent_invitations.addItem(item)
-
-    def _display_awaiting_invitations(self):
-        self.ui.awaiting_invitations.clear()
-        awaiting_invitations = self.user_service.get_friend_requests_to(self.__user)
-        for invitation in awaiting_invitations:
-            from_user = self.user_service.get_user_by_id(invitation.from_user_id)
-            item = QListWidgetItem(from_user.username)
-            item.invitation = invitation
-            self.ui.awaiting_invitations.addItem(item)
-
-    def _select_invitation(self, item: QListWidgetItem):
-        self.__selected_invitation = item.invitation
-
-    def _accept_selected_invitaiton(self):
-        self.user_service.accept_friend_request(self.__selected_invitation)
-        self._display_awaiting_invitations()
-
-    def _ignore_selected_invitation(self):
-        self.user_service.delete_friend_request(self.__selected_invitation)
-        self._display_awaiting_invitations()
 
     def _search_users(self):
         self.ui.search_result.clear()
@@ -293,11 +274,14 @@ class InviteFriendsPage(QWidget):
         username_fragment = self.ui.search_bar.text()
         sent_invitations = self.user_service.get_friend_requests_from(self.__user)
         invited_user_ids = [invitation.to_user_id for invitation in sent_invitations]
+        awaiting_invitations = self.user_service.get_friend_requests_to(self.__user)
+        already_invited_by_ids = [invitation.from_user_id for invitation in awaiting_invitations]
 
         users = self.user_service.get_users_by_username_fragment(username_fragment)
-        users = [user for user in users if user != self.__user]
+        users = [user for user in users if user.uuid != self.__user.uuid]
         users = [user for user in users if not self.__user.is_friends_with(user)]
         users = [user for user in users if user.uuid not in invited_user_ids]
+        users = [user for user in users if user.uuid not in already_invited_by_ids]
 
         for user in users:
             item = QListWidgetItem(user.username)
@@ -310,6 +294,54 @@ class InviteFriendsPage(QWidget):
 
         self.user_service.send_friend_request(self.__user, self.__selected_user)
         self._search_users()
+        self._display_sent_invitations()
+
+    def _select_awaiting_invitation(self, item: QListWidgetItem):
+        self.__awaiting_invitation = item.invitation
+
+    def _display_awaiting_invitations(self):
+        self.ui.awaiting_invitations.clear()
+        awaiting_invitations = self.user_service.get_friend_requests_to(self.__user)
+        for invitation in awaiting_invitations:
+            from_user = self.user_service.get_user_by_id(invitation.from_user_id)
+            item = QListWidgetItem(from_user.username)
+            item.invitation = invitation
+            self.ui.awaiting_invitations.addItem(item)
+
+    def _accept_awaiting_invitaiton(self):
+        if self.__awaiting_invitation is None:
+            return
+
+        self.user_service.accept_friend_request(self.__awaiting_invitation)
+        self.__user = self.user_service.refresh_user_data(self.__user)  # Udpate friend info
+        self._display_awaiting_invitations()
+        self._search_users()
+
+    def _ignore_awaiting_invitation(self):
+        if self.__awaiting_invitation is None:
+            return
+
+        self.user_service.delete_friend_request(self.__awaiting_invitation)
+        self._search_users()
+        self._display_awaiting_invitations()
+
+    def _select_sent_invitation(self, list_item: QListWidgetItem):
+        self.__sent_invitation = list_item.invitation
+
+    def _display_sent_invitations(self):
+        self.ui.sent_invitations.clear()
+        sent_invitations = self.user_service.get_friend_requests_from(self.__user)
+        for invitation in sent_invitations:
+            to_user = self.user_service.get_user_by_id(invitation.to_user_id)
+            list_item = QListWidgetItem(to_user.username)
+            list_item.invitation = invitation
+            self.ui.sent_invitations.addItem(list_item)
+
+    def _cancel_sent_invitation(self):
+        if self.__sent_invitation is None:
+            return
+
+        self.user_service.delete_friend_request(self.__sent_invitation)
         self._display_sent_invitations()
 
 

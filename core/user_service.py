@@ -65,6 +65,10 @@ class UserService:
     def get_current_user(self) -> User:
         return self.__authentication.logged_in_user
 
+    def refresh_user_data(self, user: User) -> User:
+        """Return the same user from the database, with his current state"""
+        return self.get_user_by_id(user.uuid)
+
     def save_user(self, user: User) -> User:
         return self.__user_repository.save(user)
 
