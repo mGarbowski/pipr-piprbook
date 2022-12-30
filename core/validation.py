@@ -1,3 +1,5 @@
+"""Utilities for parameter validation and appropriate exceptions"""
+
 import re
 from string import ascii_letters
 
