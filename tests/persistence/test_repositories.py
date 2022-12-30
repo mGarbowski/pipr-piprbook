@@ -3,8 +3,8 @@ from unittest.mock import MagicMock
 
 from pytest import fixture
 
-from core.model import User, Message
-from persistence.repositories import UserRepository, MessageRepository
+from core.model import User, Message, FriendRequest
+from persistence.repositories import UserRepository, MessageRepository, FriendRequestRepository
 
 
 @fixture
@@ -137,6 +137,89 @@ def message_2_json():
 
 
 @fixture
+def request_1(user_1, user_3):
+    return FriendRequest(
+        uuid="73cf4b5c-8870-11ed-942c-00155d211f36",
+        timestamp=datetime(2022, 12, 30, 20, 30),
+        from_user_id=user_1.uuid,
+        to_user_id=user_3.uuid
+    )
+
+
+@fixture
+def request_1_json():
+    return {
+        'uuid': '73cf4b5c-8870-11ed-942c-00155d211f36',
+        'timestamp': '2022-12-30T20:30:00',
+        'from_user_id': 'c1a40f26-7ba9-11ed-9382-00155df7f899',
+        'to_user_id': 'fcffaa38-8862-11ed-942c-00155d211f36'
+    }
+
+
+@fixture
+def request_2(user_2, user_3):
+    return FriendRequest(
+        uuid="143e8dd2-8871-11ed-942c-00155d211f36",
+        timestamp=datetime(2022, 12, 30, 20, 30),
+        from_user_id=user_3.uuid,
+        to_user_id=user_2.uuid
+    )
+
+
+@fixture
+def request_2_json():
+    return {
+        'uuid': '143e8dd2-8871-11ed-942c-00155d211f36',
+        'timestamp': '2022-12-30T20:30:00',
+        'from_user_id': 'fcffaa38-8862-11ed-942c-00155d211f36',
+        'to_user_id': '9a154c0c-7bba-11ed-9b3d-00155df7f899'
+    }
+
+
+@fixture
+def database(user_1_json, user_2_json, user_3_json, users_json_collection,
+             message_1_json, message_2_json,
+             request_1_json, request_2_json):
+    def get_by_id(entity_id, collection_name):
+        if collection_name == "users":
+            if entity_id == user_1_json["uuid"]:
+                return user_1_json
+            elif entity_id == user_2_json["uuid"]:
+                return user_2_json
+            elif entity_id == user_3_json["uuid"]:
+                return user_3_json
+            else:
+                return None
+        elif collection_name == "messages":
+            if entity_id == message_1_json["uuid"]:
+                return message_1_json
+            elif entity_id == message_2_json["uuid"]:
+                return message_2_json
+            else:
+                return None
+        elif collection_name == "friend_requests":
+            if entity_id == request_1_json["uuid"]:
+                return request_1_json
+            elif entity_id == request_2_json["uuid"]:
+                return request_2_json
+            else:
+                return None
+
+    def get_collection(collection_name):
+        if collection_name == "users":
+            return users_json_collection
+        elif collection_name == "messages":
+            return [message_1_json, message_2_json]
+        elif collection_name == "friend_requests":
+            return [request_1_json, request_2_json]
+
+    database = MagicMock()
+    database.get_by_id = get_by_id
+    database.get_collection = get_collection
+    return database
+
+
+@fixture
 def message_serializer(message_1, message_2, message_1_json, message_2_json):
     def to_json(message):
         if message == message_1:
@@ -157,40 +240,23 @@ def message_serializer(message_1, message_2, message_1_json, message_2_json):
 
 
 @fixture
-def message_repository(database, message_serializer):
-    return MessageRepository(database, message_serializer, "messages")
+def friend_request_serializer(request_1, request_2, request_1_json, request_2_json):
+    def to_json(entity):
+        if entity == request_1:
+            return request_1_json
+        elif entity == request_2:
+            return request_2_json
 
+    def from_json(json_dict):
+        if json_dict == request_1_json:
+            return request_1
+        elif json_dict == request_2_json:
+            return request_2
 
-@fixture
-def database(user_1_json, user_2_json, user_3_json, users_json_collection, message_1_json, message_2_json):
-    def get_by_id(entity_id, collection_name):
-        if collection_name == "users":
-            if entity_id == user_1_json["uuid"]:
-                return user_1_json
-            elif entity_id == user_2_json["uuid"]:
-                return user_2_json
-            elif entity_id == user_3_json["uuid"]:
-                return user_3_json
-            else:
-                return None
-        elif collection_name == "messages":
-            if entity_id == message_1_json["uuid"]:
-                return message_1_json
-            elif entity_id == message_2_json["uuid"]:
-                return message_2_json
-            else:
-                return None
-
-    def get_collection(collection_name):
-        if collection_name == "users":
-            return users_json_collection
-        elif collection_name == "messages":
-            return [message_1_json, message_2_json]
-
-    database = MagicMock()
-    database.get_by_id = get_by_id
-    database.get_collection = get_collection
-    return database
+    serializer = MagicMock()
+    serializer.to_json = to_json
+    serializer.from_json = from_json
+    return serializer
 
 
 @fixture
@@ -220,6 +286,16 @@ def user_serializer(user_1, user_2, user_3, user_1_json, user_2_json, user_3_jso
 @fixture
 def user_repository(database, user_serializer):
     return UserRepository(database, user_serializer, "users")
+
+
+@fixture
+def message_repository(database, message_serializer):
+    return MessageRepository(database, message_serializer, "messages")
+
+
+@fixture
+def friend_request_repository(database, friend_request_serializer):
+    return FriendRequestRepository(database, friend_request_serializer, "friend_requests")
 
 
 class TestUserRepository:
@@ -292,3 +368,30 @@ class TestMessageRepository:
     def test_get_messages_empty(self, message_repository, user_1, user_2, user_3):
         assert message_repository.get_messages(user_1, user_3) == []
         assert message_repository.get_messages(user_2, user_3) == []
+
+
+class TestFriendRequestRepository:
+
+    def test_save(self, friend_request_repository, database, request_1, request_1_json):
+        friend_request_repository.save(request_1)
+        database.save.assert_called_with(request_1_json, "friend_requests")
+
+    def test_get_by_id(self, friend_request_repository, request_1):
+        assert friend_request_repository.get_by_id(request_1.uuid) == request_1
+
+    def test_get_by_id_does_not_exist(self, friend_request_repository):
+        assert friend_request_repository.get_by_id("75ea57ea-8872-11ed-942c-00155d211f36") is None
+
+    def test_delete(self, friend_request_repository, database, request_1):
+        friend_request_repository.delete(request_1)
+        database.delete_by_id.assert_called_with(request_1.uuid, "friend_requests")
+
+    def test_get_requests_to_user(self, friend_request_repository, user_3, user_2, user_1, request_1, request_2):
+        assert friend_request_repository.get_requests_to_user(user_3) == [request_1]
+        assert friend_request_repository.get_requests_to_user(user_2) == [request_2]
+        assert friend_request_repository.get_requests_to_user(user_1) == []
+
+    def test_get_requests_from_user(self, friend_request_repository, user_1, user_2, user_3, request_1, request_2):
+        assert friend_request_repository.get_requests_from_user(user_1) == [request_1]
+        assert friend_request_repository.get_requests_from_user(user_2) == []
+        assert friend_request_repository.get_requests_from_user(user_3) == [request_2]

@@ -144,36 +144,69 @@ def _is_message_matched(message: Message, user_a: User, user_b: User) -> bool:
 
 
 class FriendRequestRepository:
-    def __init__(self, database: Database, serializer: JsonSerializer[FriendRequest],
-                 collection_name: str = "friend_requests"):
+    """Class for accessing friend requests stored in a database"""
+
+    def __init__(
+            self,
+            database: Database,
+            serializer: JsonSerializer[FriendRequest],
+            collection_name: str = "friend_requests"
+    ):
+        """Create FriendRequestRepository connected to the given database
+
+        :param database: database to persist friend requests in
+        :param serializer: JSON serializer for friend requests
+        :param collection_name: collection name in the database, default to "friend_requests"
+        """
         self.__database = database
         self.__serializer = serializer
         self.__collection_name = collection_name
 
     def save(self, friend_request: FriendRequest):
+        """Create new friend request or update existing one
+
+        :param friend_request: friend request to save or update
+        """
         request_dict = self.__serializer.to_json(friend_request)
         self.__database.save(request_dict, self.__collection_name)
 
     def get_by_id(self, friend_request_id: str) -> Optional[FriendRequest]:
+        """Get friend request by id or None if it does not exist
+
+        :param friend_request_id: id of searched friend request
+        """
         request_dict = self.__database.get_by_id(friend_request_id, self.__collection_name)
         return self.__serializer.from_json(request_dict) if request_dict else None
 
     def delete(self, friend_request: FriendRequest):
+        """Delete friend request or do nothing if it does not exist in the database
+
+        :param friend_request: friend request to delete
+        """
         self.__database.delete_by_id(friend_request.uuid, self.__collection_name)
 
     def get_requests_to_user(self, to_user: User) -> List[FriendRequest]:
+        """Get all requests sent to given user, ordered by timestamp
+
+        :param to_user: user receiving friend requests
+        """
         requests = self._get_all_requests()
         requests = [req for req in requests if req.to_user_id == to_user.uuid]
         requests = sorted(requests, key=lambda req: req.timestamp)
         return requests
 
     def get_requests_from_user(self, from_user: User) -> List[FriendRequest]:
+        """Get all requests sent by the given user, ordered by timestamp
+
+        :param from_user: user sending friend requests
+        """
         requests = self._get_all_requests()
         requests = [req for req in requests if req.from_user_id == from_user.uuid]
         requests = sorted(requests, key=lambda req: req.timestamp)
         return requests
 
     def _get_all_requests(self) -> List[FriendRequest]:
+        """Get all friend requests from the database"""
         requests_json = self.__database.get_collection(self.__collection_name)
         return [self.__serializer.from_json(req_json) for req_json in requests_json]
 
