@@ -140,7 +140,8 @@ class Photo:
             raise IncorrectUuidError(self.uuid)
         if not is_filename(self.filename):
             raise IncorrectFilenameError(self.filename)
-        if self.format not in self.supported_file_formats:
+        formats = self.supported_file_formats
+        if self.format not in formats:
             raise UnsupportedFileFormatError(self.format)
         if not is_hex(self.binary_data_hex):
             raise IncorrectHexRepresentationError()
