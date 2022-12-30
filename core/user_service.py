@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Optional, List
 
 from core.authentication import Authentication, UnauthorizedError, LoginFailedException, hash_password, generate_salt
-from core.common import generate_uuid
+from core.identifiers import generate_uuid
 from core.model import FriendRequest, Message, User, Photo
 from persistence.repositories import (
     FriendRequestRepository, MessageRepository, PhotoRepository, UserRepository

@@ -3,7 +3,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional, Protocol, List, BinaryIO
 
-from core.common import generate_uuid
+from core.identifiers import generate_uuid
 
 
 class Entity(Protocol):
