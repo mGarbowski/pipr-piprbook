@@ -1,11 +1,23 @@
-import re
+"""Model classes structuring data used by the application and persisted in a database"""
+
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, Protocol, List, BinaryIO, Tuple
 
-from core.authentication import is_hash, is_salt
-from core.identifiers import generate_uuid, is_uuid
+from core.identifiers import generate_uuid
+from core.validation import (
+    is_email, is_filename, is_hex, is_uuid,
+    IncorrectUuidError,
+    IncorrectUsernameError,
+    IncorrectEmailError,
+    IncorrectPasswordHashError,
+    IncorrectSaltError,
+    IncorrectMessageTextError,
+    IncorrectFilenameError,
+    UnsupportedFileFormatError,
+    IncorrectHexRepresentationError, is_hash, is_salt
+)
 
 
 class Entity(Protocol):
@@ -162,75 +174,3 @@ class Photo:
         binary_data_hex = photo_data.hex()
 
         return cls(uuid, filename, file_format, binary_data_hex)
-
-
-def is_email(text: str) -> bool:
-    """Return whether given text is a valid email address"""
-    email_pattern = re.compile(r"([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+")
-    return bool(re.fullmatch(email_pattern, text))
-
-
-def is_filename(text: str) -> bool:
-    """Return whether given text is a valid filename"""
-    filename_pattern = re.compile(r".+\..+")
-    return bool(re.fullmatch(filename_pattern, text))
-
-
-def is_hex(text: str) -> bool:
-    """Return whether given text is a string of hexadecimal digits"""
-    return all(char in "01234556789abcdef" for char in text)
-
-
-class ModelError(ValueError):
-    """Exception signaling incorrect value for a model class"""
-    pass
-
-
-class IncorrectUuidError(ModelError):
-    def __init__(self, uuid):
-        super().__init__(f"{uuid} is not a uuid")
-        self.uuid = uuid
-
-
-class IncorrectUsernameError(ModelError):
-    pass
-
-
-class IncorrectEmailError(ModelError):
-    def __init__(self, email):
-        super().__init__(f"{email} is not a valid email address")
-        self.email = email
-
-
-class IncorrectPasswordHashError(ModelError):
-    def __init__(self, password_hash):
-        super().__init__(f"{password_hash} is not a valid hash")
-        self.password_hash = password_hash
-
-
-class IncorrectSaltError(ModelError):
-    def __init__(self, salt):
-        super().__init__(f"{salt} is not a valid salt")
-        self.salt = salt
-
-
-class IncorrectMessageTextError(ModelError):
-    def __init__(self):
-        super().__init__("Message text cannot be empty")
-
-
-class IncorrectFilenameError(ModelError):
-    def __init__(self, filename):
-        super().__init__(f"{filename} is not a correct filename")
-        self.filename = filename
-
-
-class UnsupportedFileFormatError(ModelError):
-    def __init__(self, file_format):
-        super().__init__(f"{file_format} is not supported")
-        self.file_format = file_format
-
-
-class IncorrectHexRepresentationError(ModelError):
-    def __init__(self):
-        super().__init__("Hex representation must be a string consisting of digits 0-9 and letters a-f")

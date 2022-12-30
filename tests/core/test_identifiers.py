@@ -1,4 +1,5 @@
-from core.identifiers import is_uuid, generate_uuid
+from core.identifiers import generate_uuid
+from core.validation import is_uuid
 
 
 class TestIsUuid:

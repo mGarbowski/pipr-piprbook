@@ -2,8 +2,9 @@ from unittest.mock import MagicMock
 
 from pytest import raises, fixture
 
-from core.authentication import Authentication, IncorrectPasswordError, UserDoesNotExistError, hash_password, is_hash, \
-    is_salt, generate_salt
+from core.authentication import Authentication, IncorrectPasswordError, UserDoesNotExistError, hash_password, \
+    generate_salt
+from core.validation import is_hash, is_salt
 from core.model import User
 from persistence.repositories import UserRepository
 
