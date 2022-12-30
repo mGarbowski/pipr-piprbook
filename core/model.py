@@ -58,7 +58,7 @@ class User:
         for friend_id in self.friend_uuids:
             if not is_uuid(friend_id):
                 raise IncorrectUuidError(friend_id)
-        if not is_uuid(self.profile_picture_id):
+        if (self.profile_picture_id is not None) and (not is_uuid(self.profile_picture_id)):
             raise IncorrectUuidError(self.profile_picture_id)
 
     def is_friends_with(self, user: 'User') -> bool:
@@ -140,13 +140,13 @@ class Photo:
             raise IncorrectUuidError(self.uuid)
         if not is_filename(self.filename):
             raise IncorrectFilenameError(self.filename)
-        if self.format not in Photo.suppoerted_file_formats:
+        if self.format not in self.supported_file_formats:
             raise UnsupportedFileFormatError(self.format)
         if not is_hex(self.binary_data_hex):
             raise IncorrectHexRepresentationError()
 
     @property
-    def suppoerted_file_formats(self) -> Tuple[str, ...]:
+    def supported_file_formats(self) -> Tuple[str, ...]:
         """Return tuple of suppoerted file formats"""
         return "jpg", "png"
 

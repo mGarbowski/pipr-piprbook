@@ -15,8 +15,8 @@ def user_1() -> User:
         uuid="c1a40f26-7ba9-11ed-9382-00155df7f899",
         username="user 1",
         email="email@example.com",
-        password_hash="846ec57e1d6d3999798bfddb39de19c08e6a74ec17705d88b7314dd4a7694e48",
-        salt="abcdefgh"
+        password_hash="fb99705459b651e7c37b0da74a53a23fe1920b91a0553eaacd9098a3fe4025cd",
+        salt="aaaaaaaaaa"
     )
 
 
@@ -26,8 +26,8 @@ def user_2() -> User:
         uuid="9a154c0c-7bba-11ed-9b3d-00155df7f899",
         username="user 2",
         email="email2@example.com",
-        password_hash="f06d0349dd77b094c4ea1f756a1653408f27eda416f08ffd32e37e5c989ce043",
-        salt="saltsaltsalt"
+        password_hash="b5c90ac7dc4c828717699bc943bfeb54e6f682ca055bfc5591c8a471dfc0d794",
+        salt="saltsaltsa"
     )
 
 

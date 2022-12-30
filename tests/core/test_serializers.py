@@ -9,12 +9,12 @@ from core.serializers import UserSerializer, RepresentationError, MessageSeriali
 
 class TestUserSerializer:
     def test_to_json_all_fields(self):
-        user = User(
+        user = User(  # password = "password"
             uuid="c1a40f26-7ba9-11ed-9382-00155df7f899",
             username="username",
             email="email@example.com",
-            password_hash="DD130A849D7B29E5541B05D2F7F86A4ACD4F1EC598C1C9438783F56BC4F0FF80",
-            salt="abc",
+            password_hash="fb99705459b651e7c37b0da74a53a23fe1920b91a0553eaacd9098a3fe4025cd",
+            salt="aaaaaaaaaa",
             friend_uuids=[
                 "47ea7d2c-7baa-11ed-9382-00155df7f899",
                 "4d2845c6-7baa-11ed-9382-00155df7f899",
@@ -30,8 +30,8 @@ class TestUserSerializer:
             "uuid": "c1a40f26-7ba9-11ed-9382-00155df7f899",
             "username": "username",
             "email": "email@example.com",
-            "password_hash": "DD130A849D7B29E5541B05D2F7F86A4ACD4F1EC598C1C9438783F56BC4F0FF80",
-            "salt": "abc",
+            "password_hash": "fb99705459b651e7c37b0da74a53a23fe1920b91a0553eaacd9098a3fe4025cd",
+            "salt": "aaaaaaaaaa",
             "friend_uuids": [
                 "47ea7d2c-7baa-11ed-9382-00155df7f899",
                 "4d2845c6-7baa-11ed-9382-00155df7f899",
@@ -42,12 +42,12 @@ class TestUserSerializer:
         }
 
     def test_to_json_default_fields(self):
-        user = User(
+        user = User(  # password = "password"
             uuid="c1a40f26-7ba9-11ed-9382-00155df7f899",
             username="username",
             email="email@example.com",
-            password_hash="DD130A849D7B29E5541B05D2F7F86A4ACD4F1EC598C1C9438783F56BC4F0FF80",
-            salt="abc"
+            password_hash="fb99705459b651e7c37b0da74a53a23fe1920b91a0553eaacd9098a3fe4025cd",
+            salt="aaaaaaaaaa"
         )
 
         serializer = UserSerializer()
@@ -56,8 +56,8 @@ class TestUserSerializer:
             "uuid": "c1a40f26-7ba9-11ed-9382-00155df7f899",
             "username": "username",
             "email": "email@example.com",
-            "password_hash": "DD130A849D7B29E5541B05D2F7F86A4ACD4F1EC598C1C9438783F56BC4F0FF80",
-            "salt": "abc",
+            "password_hash": "fb99705459b651e7c37b0da74a53a23fe1920b91a0553eaacd9098a3fe4025cd",
+            "salt": "aaaaaaaaaa",
             "friend_uuids": [],
             "profile_picture_id": None,
             "bio": None
@@ -68,8 +68,8 @@ class TestUserSerializer:
             "uuid": "c1a40f26-7ba9-11ed-9382-00155df7f899",
             "username": "username",
             "email": "email@example.com",
-            "password_hash": "DD130A849D7B29E5541B05D2F7F86A4ACD4F1EC598C1C9438783F56BC4F0FF80",
-            "salt": "abc",
+            "password_hash": "fb99705459b651e7c37b0da74a53a23fe1920b91a0553eaacd9098a3fe4025cd",
+            "salt": "aaaaaaaaaa",
             "friend_uuids": [
                 "47ea7d2c-7baa-11ed-9382-00155df7f899",
                 "4d2845c6-7baa-11ed-9382-00155df7f899",
@@ -85,8 +85,8 @@ class TestUserSerializer:
             uuid="c1a40f26-7ba9-11ed-9382-00155df7f899",
             username="username",
             email="email@example.com",
-            password_hash="DD130A849D7B29E5541B05D2F7F86A4ACD4F1EC598C1C9438783F56BC4F0FF80",
-            salt="abc",
+            password_hash="fb99705459b651e7c37b0da74a53a23fe1920b91a0553eaacd9098a3fe4025cd",
+            salt="aaaaaaaaaa",
             friend_uuids=[
                 "47ea7d2c-7baa-11ed-9382-00155df7f899",
                 "4d2845c6-7baa-11ed-9382-00155df7f899",
@@ -101,8 +101,8 @@ class TestUserSerializer:
             "uuid": "c1a40f26-7ba9-11ed-9382-00155df7f899",
             "username": "username",
             "email": "email@example.com",
-            "password_hash": "DD130A849D7B29E5541B05D2F7F86A4ACD4F1EC598C1C9438783F56BC4F0FF80",
-            "salt": "abc",
+            "password_hash": "fb99705459b651e7c37b0da74a53a23fe1920b91a0553eaacd9098a3fe4025cd",
+            "salt": "aaaaaaaaaa",
             "friend_uuids": [],
             "profile_picture_id": None,
             "bio": None
@@ -113,8 +113,8 @@ class TestUserSerializer:
             uuid="c1a40f26-7ba9-11ed-9382-00155df7f899",
             username="username",
             email="email@example.com",
-            password_hash="DD130A849D7B29E5541B05D2F7F86A4ACD4F1EC598C1C9438783F56BC4F0FF80",
-            salt="abc"
+            password_hash="fb99705459b651e7c37b0da74a53a23fe1920b91a0553eaacd9098a3fe4025cd",
+            salt="aaaaaaaaaa"
         )
 
     def test_invalid_representation(self):
