@@ -3,8 +3,8 @@ from unittest.mock import MagicMock
 
 from pytest import fixture
 
-from core.model import User, Message, FriendRequest
-from persistence.repositories import UserRepository, MessageRepository, FriendRequestRepository
+from core.model import User, Message, FriendRequest, Photo
+from persistence.repositories import UserRepository, MessageRepository, FriendRequestRepository, PhotoRepository
 
 
 @fixture
@@ -177,9 +177,30 @@ def request_2_json():
 
 
 @fixture
+def photo_1():
+    return Photo(
+        uuid="d9eaaf36-8874-11ed-942c-00155d211f36",
+        filename="photo.jpg",
+        format="jpg",
+        binary_data_hex="1560138213851237906523195361abcbbba"
+    )
+
+
+@fixture
+def photo_1_json():
+    return {
+        'uuid': 'd9eaaf36-8874-11ed-942c-00155d211f36',
+        'filename': 'photo.jpg',
+        'format': 'jpg',
+        'binary_data_hex': '1560138213851237906523195361abcbbba'
+    }
+
+
+@fixture
 def database(user_1_json, user_2_json, user_3_json, users_json_collection,
              message_1_json, message_2_json,
-             request_1_json, request_2_json):
+             request_1_json, request_2_json,
+             photo_1_json):
     def get_by_id(entity_id, collection_name):
         if collection_name == "users":
             if entity_id == user_1_json["uuid"]:
@@ -204,6 +225,9 @@ def database(user_1_json, user_2_json, user_3_json, users_json_collection,
                 return request_2_json
             else:
                 return None
+        elif collection_name == "photos":
+            if entity_id == photo_1_json["uuid"]:
+                return photo_1_json
 
     def get_collection(collection_name):
         if collection_name == "users":
@@ -212,6 +236,8 @@ def database(user_1_json, user_2_json, user_3_json, users_json_collection,
             return [message_1_json, message_2_json]
         elif collection_name == "friend_requests":
             return [request_1_json, request_2_json]
+        elif collection_name == "photos":
+            return [photo_1_json]
 
     database = MagicMock()
     database.get_by_id = get_by_id
@@ -284,6 +310,22 @@ def user_serializer(user_1, user_2, user_3, user_1_json, user_2_json, user_3_jso
 
 
 @fixture
+def photo_serializer(photo_1, photo_1_json):
+    def to_json(entity):
+        if entity == photo_1:
+            return photo_1_json
+
+    def from_json(json_dict):
+        if json_dict == photo_1_json:
+            return photo_1
+
+    serializer = MagicMock()
+    serializer.to_json = to_json
+    serializer.from_json = from_json
+    return serializer
+
+
+@fixture
 def user_repository(database, user_serializer):
     return UserRepository(database, user_serializer, "users")
 
@@ -296,6 +338,11 @@ def message_repository(database, message_serializer):
 @fixture
 def friend_request_repository(database, friend_request_serializer):
     return FriendRequestRepository(database, friend_request_serializer, "friend_requests")
+
+
+@fixture
+def photo_repository(database, photo_serializer):
+    return PhotoRepository(database, photo_serializer, "photos")
 
 
 class TestUserRepository:
@@ -395,3 +442,20 @@ class TestFriendRequestRepository:
         assert friend_request_repository.get_requests_from_user(user_1) == [request_1]
         assert friend_request_repository.get_requests_from_user(user_2) == []
         assert friend_request_repository.get_requests_from_user(user_3) == [request_2]
+
+
+class TestPhotoRepository:
+
+    def test_save(self, photo_repository, database, photo_1, photo_1_json):
+        photo_repository.save(photo_1)
+        database.save.assert_called_with(photo_1_json, "photos")
+
+    def test_get_by_id(self, photo_repository, photo_1):
+        assert photo_repository.get_by_id(photo_1.uuid) == photo_1
+
+    def test_get_by_id_does_not_exist(self, photo_repository):
+        assert photo_repository.get_by_id("3857ab2c-8876-11ed-b239-00155d211f36") is None
+
+    def test_delete(self, photo_repository, database, photo_1):
+        photo_repository.delete(photo_1)
+        database.delete_by_id.assert_called_with(photo_1.uuid, "photos")

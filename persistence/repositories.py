@@ -212,22 +212,45 @@ class FriendRequestRepository:
 
 
 class PhotoRepository:
+    """Class for accessing photos stored in a database"""
 
-    def __init__(self, database: Database, serializer: JsonSerializer[Photo],
-                 collection_name: str = "photos"):
+    def __init__(
+            self,
+            database: Database,
+            serializer: JsonSerializer[Photo],
+            collection_name: str = "photos"
+    ):
+        """Create a PhotoRepository connected to the given database
+
+        :param database: database to persist photos in
+        :param serializer: JSON serializer for photos
+        :param collection_name: collection name in the database, defaults to "photos"
+        """
         self.__database = database
         self.__serializer = serializer
         self.__collection_name = collection_name
 
     def save(self, photo: Photo):
+        """Create new photo or update existing one
+
+        :param photo: photo to create or update
+        """
         photo_dict = self.__serializer.to_json(photo)
         self.__database.save(photo_dict, self.__collection_name)
 
     def get_by_id(self, photo_id: str) -> Optional[Photo]:
+        """Get photo by id or None if it does not exist
+
+        :param photo_id: id of searched photo
+        """
         photo_dict = self.__database.get_by_id(photo_id, self.__collection_name)
         return self.__serializer.from_json(photo_dict) if photo_dict else None
 
     def delete(self, photo: Photo):
+        """Delete photo or do nothing if it does not exist in the database
+
+        :param photo: photo to delete
+        """
         self.__database.delete_by_id(photo.uuid, self.__collection_name)
 
 # TODO: factor out an abstract class
