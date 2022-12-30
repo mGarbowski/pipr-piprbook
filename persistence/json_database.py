@@ -6,7 +6,6 @@ from typing import TextIO, Optional, Dict, List
 SerializedCollection = Dict[str, Dict]
 
 
-# TODO: update docs, refactor, add unit tests
 class JsonDatabase:
     """Database in a JSON file storing collections of entity dictionaries
 
