@@ -1,6 +1,6 @@
 """Generating and validating IDs"""
 
-from re import match
+import re
 from uuid import uuid1
 
 
@@ -14,5 +14,5 @@ def is_uuid(uuid: str) -> bool:
 
     :param uuid: string to check
     """
-    uuid_pattern = r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
-    return bool(match(uuid_pattern, uuid))
+    uuid_pattern = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
+    return bool(re.fullmatch(uuid_pattern, uuid))
