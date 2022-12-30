@@ -20,15 +20,15 @@ class JsonDatabase:
     mapping is passed as a contructor parameter
     """
 
-    def __init__(self, db_file: TextIO, collection_name_mapping: Dict[Type, str]):
+    def __init__(self, db_file: TextIO, collection_names: List[str]):
         """Create a new database instance persisting data in the given file
 
         :param db_file: file to persist data in
         :param collection_name_mapping: dictionary mapping model classes to collection names in the database
         """
-        JsonDatabase._verify_file(db_file, collection_name_mapping)
+        JsonDatabase._verify_file(db_file, collection_names)
         self.__db_file = db_file
-        self.__collection_name_mapping = collection_name_mapping
+        self.__collection_names = collection_names
 
     def get_by_id(self, entity_id: str, collection_name: str) -> Optional[Dict]:
         """Get an entity by its id or None if not found
@@ -36,11 +36,13 @@ class JsonDatabase:
         :param entity_id: id of entity
         :param collection_name: type of searched entity
         """
+        self._verify_collection_name(collection_name)
         collection = self._get_serialized_collection(collection_name)
         return collection[entity_id] if entity_id in collection else None
 
     def save(self, entity_dict: Dict, collection_name: str) -> None:
         """Save an entity to the database, overwriting previous value if it existed"""
+        self._verify_collection_name(collection_name)
         collection = self._get_serialized_collection(collection_name)
         collection[entity_dict["uuid"]] = entity_dict
         self._save_serialized_collection(collection, collection_name)
@@ -50,6 +52,7 @@ class JsonDatabase:
 
         If entity is not saved in the database - do nothing
         """
+        self._verify_collection_name(collection_name)
         collection = self._get_serialized_collection(collection_name)
         try:
             collection.pop(entity_id)
@@ -59,6 +62,7 @@ class JsonDatabase:
 
     def get_collection(self, collection_name: str) -> List[Dict]:
         """Get collection of entities by their type"""
+        self._verify_collection_name(collection_name)
         collection = self._get_serialized_collection(collection_name)
         return list(collection.values())
 
@@ -72,6 +76,7 @@ class JsonDatabase:
         :raises ValueError: if at the same time collection is empty and type is not specified
             or the collection is not empty and type is specified
         """
+        self._verify_collection_name(collection_name)
         serialized_collection = {entity_dict["uuid"]: entity_dict for entity_dict in collection}
         self._save_serialized_collection(serialized_collection, collection_name)
 
@@ -102,8 +107,12 @@ class JsonDatabase:
         self.__db_file.truncate(0)  # Delete file content
         json.dump(collections, self.__db_file)
 
+    def _verify_collection_name(self, collection_name: str):
+        if collection_name not in self.__collection_names:
+            raise CollectionDoesNotExistError(collection_name)
+
     @staticmethod
-    def _verify_file(db_file: TextIO, collection_name_mapping: Dict[Type, str]) -> None:
+    def _verify_file(db_file: TextIO, collection_names: List[str]) -> None:
         """Verify that given file valid for given mapping of collection names
 
         File must be readable and writable.
@@ -120,9 +129,9 @@ class JsonDatabase:
 
         try:
             file_data = json.load(db_file)
-            collection_names = set(collection_name_mapping.values())
             file_keys = set(file_data.keys())
-            if not collection_names.issubset(file_keys):
+            collection_names_set = set(collection_names)
+            if not collection_names_set.issubset(file_keys):
                 raise InvalidDatabaseFileError("JSON must contain all specified collections")
         except Exception as e:
             raise InvalidDatabaseFileError("File must be in JSON format") from e
@@ -131,3 +140,9 @@ class JsonDatabase:
 class InvalidDatabaseFileError(ValueError):
     """Error Signaling that a JSON file is not a valid representation of a database"""
     pass
+
+
+class CollectionDoesNotExistError(Exception):
+    def __init__(self, collection_name):
+        super().__init__(f"Collection {collection_name} does not exist")
+        self.collection_name = collection_name

@@ -9,12 +9,13 @@ from persistence.repositories import PhotoRepository, MessageRepository, UserRep
 
 
 def get_user_service_default(db_file: TextIO) -> UserService:
-    collection_names = {
+    collection_name_map = {
         User: "users",
         Message: "messages",
         FriendRequest: "friend_requests",
         Photo: "photos"
     }
+    collection_names = list(collection_name_map.values())
     database = JsonDatabase(db_file, collection_names)
 
     user_serializer = UserSerializer()
@@ -22,11 +23,11 @@ def get_user_service_default(db_file: TextIO) -> UserService:
     friend_request_serializer = FriendRequestSerializer()
     photo_serializer = PhotoSerializer()
 
-    user_repository = UserRepository(database, user_serializer, collection_names[User])
-    message_repository = MessageRepository(database, message_serializer, collection_names[Message])
+    user_repository = UserRepository(database, user_serializer, collection_name_map[User])
+    message_repository = MessageRepository(database, message_serializer, collection_name_map[Message])
     friend_request_repository = FriendRequestRepository(database, friend_request_serializer,
-                                                        collection_names[FriendRequest])
-    photo_repository = PhotoRepository(database, photo_serializer, collection_names[Photo])
+                                                        collection_name_map[FriendRequest])
+    photo_repository = PhotoRepository(database, photo_serializer, collection_name_map[Photo])
 
     authentication = Authentication(user_repository)
     user_service = UserService(
