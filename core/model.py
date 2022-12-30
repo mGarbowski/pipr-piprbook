@@ -16,7 +16,7 @@ from core.validation import (
     IncorrectMessageTextError,
     IncorrectFilenameError,
     UnsupportedFileFormatError,
-    IncorrectHexRepresentationError, is_hash, is_salt
+    IncorrectHexRepresentationError, is_hash, is_salt, SelfReferenceError
 )
 
 
@@ -84,6 +84,7 @@ class Message:
 
         :raises IncorrectUuidError: if uuid, from_user_id or to_user_id is not a valid uuid
         :raises IncorrectMessageTextError: if text is empty
+        :raises SelfReferenceError: if from and to users are the same
         """
         if not is_uuid(self.uuid):
             raise IncorrectUuidError(self.uuid)
@@ -93,6 +94,8 @@ class Message:
             raise IncorrectUuidError(self.from_user_id)
         if not is_uuid(self.to_user_id):
             raise IncorrectUuidError(self.to_user_id)
+        if self.to_user_id == self.from_user_id:
+            raise SelfReferenceError()
 
 
 @dataclass
@@ -108,6 +111,7 @@ class FriendRequest:
         """Validate parameters
 
         :raises IncorrectUuidError: if uuid, from_user_id or to_user_id is not a valid uuid
+        :raises SelfReferenceError: if from and to users are the same
         """
         if not is_uuid(self.uuid):
             raise IncorrectUuidError(self.uuid)
@@ -115,6 +119,8 @@ class FriendRequest:
             raise IncorrectUuidError(self.from_user_id)
         if not is_uuid(self.to_user_id):
             raise IncorrectUuidError(self.to_user_id)
+        if self.to_user_id == self.from_user_id:
+            raise SelfReferenceError()
 
 
 @dataclass

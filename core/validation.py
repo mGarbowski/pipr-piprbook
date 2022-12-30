@@ -105,3 +105,9 @@ class UnsupportedFileFormatError(ModelError):
 class IncorrectHexRepresentationError(ModelError):
     def __init__(self):
         super().__init__("Hex representation must be a string consisting of digits 0-9 and letters a-f")
+
+
+class SelfReferenceError(ModelError):
+
+    def __init__(self):
+        super().__init__("to_user and from_user cannot be the same")
