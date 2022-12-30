@@ -1,14 +1,14 @@
 """Repository classes for accessing data persisted in a Database"""
 from abc import ABC
-from typing import Optional, List, TypeVar
+from typing import Optional, List, TypeVar, Generic
 
-from core.model import User, Message, FriendRequest, Entity
+from core.model import User, Message, FriendRequest, Entity, Photo
 from persistence.interface import Database, JsonSerializer
 
 T = TypeVar("T", bound=Entity)
 
 
-class BaseRepository(ABC):
+class BaseRepository(ABC, Generic[T]):
     def __init__(
             self,
             database: Database,
@@ -49,7 +49,7 @@ class BaseRepository(ABC):
         self._database.delete_by_id(entity.uuid, self._collection_name)
 
 
-class UserRepository(BaseRepository):
+class UserRepository(BaseRepository[User]):
     """Class for accessing users stored in a database"""
 
     def __init__(
@@ -103,7 +103,7 @@ class UserRepository(BaseRepository):
         ]
 
 
-class MessageRepository(BaseRepository):
+class MessageRepository(BaseRepository[Message]):
     """Class for accessing messages persisted in a database"""
 
     def __init__(
@@ -142,7 +142,7 @@ def _is_message_matched(message: Message, user_a: User, user_b: User) -> bool:
     return message.to_user_id in user_ids and message.from_user_id in user_ids
 
 
-class FriendRequestRepository(BaseRepository):
+class FriendRequestRepository(BaseRepository[FriendRequest]):
     """Class for accessing friend requests stored in a database"""
 
     def __init__(
@@ -185,7 +185,7 @@ class FriendRequestRepository(BaseRepository):
         return [self._serializer.from_json(req_json) for req_json in requests_json]
 
 
-class PhotoRepository(BaseRepository):
+class PhotoRepository(BaseRepository[Photo]):
     """Class for accessing photos stored in a database"""
 
     def __init__(
