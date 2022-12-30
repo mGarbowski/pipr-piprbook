@@ -50,6 +50,9 @@ def authentication(user_repository) -> Authentication:
 
 class TestAuthentication:
 
+    def test_logged_in_user_initially_none(self, authentication):
+        assert authentication.logged_in_user is None
+
     def test_log_in_successful(self, authentication, user_1):
         assert authentication.logged_in_user is None
 
