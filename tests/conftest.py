@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from model import User, Message, FriendRequest, Photo
+from core.model import User, Message, FriendRequest, Photo
 from pytest import fixture
 
 

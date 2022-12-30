@@ -6,7 +6,7 @@ from pytest import fixture, raises
 
 from core.authentication import LoginFailedError, UnauthorizedError
 from core.user_service import UserService, UsernameTakenException, EmailAlreadyUsedException
-from model import FriendRequest
+from core.model import FriendRequest
 
 
 @fixture
