@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional, List
 
-from core.authentication import Authentication, UnauthorizedError, LoginFailedException, hash_password, generate_salt
+from core.authentication import Authentication, UnauthorizedError, LoginFailedError, hash_password, generate_salt
 from core.identifiers import generate_uuid
 from core.model import FriendRequest, Message, User, Photo
 from persistence.repositories import (
@@ -30,7 +30,7 @@ class UserService:
         try:
             self.__authentication.log_in(username, password)
             return True
-        except LoginFailedException:
+        except LoginFailedError:
             return False
 
     def log_out_user(self):

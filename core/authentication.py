@@ -1,3 +1,5 @@
+"""User authentication and authorization, salting and hashing utilities"""
+
 from copy import deepcopy
 from hashlib import sha256
 from random import choices
@@ -54,7 +56,7 @@ class Authentication:
     def logged_in_user(self) -> Optional[User]:
         """Return a deep copy of currently logged-in user
 
-        Copying to prevent from mutating the user externally - security vulnerability
+        Copying to prevent from mutating the user externally - avoid security vulnerability
         """
         return deepcopy(self.__logged_in_user)
 
@@ -73,14 +75,16 @@ def hash_password(password: str, salt: str) -> str:
 
 
 def generate_salt() -> str:
+    """Generate a random string of ascii letters"""
     return "".join(choices(ascii_letters, k=10))
 
 
-class LoginFailedException(Exception):
+class LoginFailedError(Exception):
+    """Generic exception signaling that a log-in attempt failed"""
     pass
 
 
-class UserDoesNotExistError(LoginFailedException):
+class UserDoesNotExistError(LoginFailedError):
     """Exception signaling that there is no user with given login/username"""
 
     def __init__(self, username):
@@ -88,7 +92,7 @@ class UserDoesNotExistError(LoginFailedException):
         self.username = username
 
 
-class IncorrectPasswordError(LoginFailedException):
+class IncorrectPasswordError(LoginFailedError):
     """Exception singaling that given password is incorrect"""
 
     def __init__(self):
@@ -96,4 +100,5 @@ class IncorrectPasswordError(LoginFailedException):
 
 
 class UnauthorizedError(Exception):
+    """Exception signaling that user is unauthorized to perform certain operation"""
     pass
