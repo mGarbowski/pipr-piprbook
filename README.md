@@ -57,3 +57,14 @@ Sprawdzenie typów
 ```bash
 mypy core persistence gui
 ```
+
+Sprawdzenie formatowania
+```bash
+flake8 core gui persistence --exclude gui/ui_component_templates,gui/ui_components
+```
+
+Sprawdzenie pokrycia
+```bash
+coverage run -m pytest ./tests
+coverage report -m
+```
