@@ -1,3 +1,5 @@
+"""Repository classes for accessing data persisted in a Database"""
+
 from typing import Optional, List
 
 from core.model import User, Message, FriendRequest, Photo
@@ -5,39 +7,78 @@ from persistence.interface import Database, JsonSerializer
 
 
 class UserRepository:
-    def __init__(self, database: Database, serializer: JsonSerializer[User],
-                 collection_name: str = "users"):
+    """Class for accessing users stored in a database"""
+
+    def __init__(
+            self,
+            database: Database,
+            serializer: JsonSerializer[User],
+            collection_name: str = "users"
+    ):
+        """Create UserRepository connected to the given database
+
+        :param database: database object to persist users in
+        :param serializer: JSON serializer for users
+        :param collection_name: name of collection in datbase, defaults to "users"
+        """
         self.__database = database
         self.__serializer = serializer
         self.__collection_name = collection_name
 
     def get_all(self) -> List[User]:
+        """Get all users"""
         users_json = self.__database.get_collection(self.__collection_name)
         users = [self.__serializer.from_json(user_json) for user_json in users_json]
         return users
 
     def save(self, user: User):
+        """Create new user or update existing one
+
+        :param user: user to create or update
+        """
         user_dict = self.__serializer.to_json(user)
         self.__database.save(user_dict, self.__collection_name)
 
     def get_by_id(self, user_id: str) -> Optional[User]:
+        """Get user by id or None if it does not exist
+
+        :param user_id: id of searched user
+        """
         user_dict = self.__database.get_by_id(user_id, self.__collection_name)
         return self.__serializer.from_json(user_dict) if user_dict is not None else None
 
-    def delete(self, user: User):
+    def delete(self, user: User) -> None:
+        """Delete user
+
+        :param user: user to delete
+        """
         self.__database.delete_by_id(user.uuid, self.__collection_name)
 
     def get_by_username(self, username: str) -> Optional[User]:
+        """Get user by username or None if not found
+
+        :param username: username matched exactly to a user
+        """
         users = self.get_all()
         users = [user for user in users if user.username == username]
         return users[0] if users else None
 
     def get_by_email(self, email: str) -> Optional[User]:
+        """Get user by email or None if not found
+
+        If email is not unique, may return any matching user instance
+
+        :param email: email address of searched user
+        """
         users = self.get_all()
         users = [user for user in users if user.email == email]
         return users[0] if users else None
 
-    def get_by_username_fragment(self, username_fragment: str):
+    def get_by_username_fragment(self, username_fragment: str) -> List[User]:
+        """Get all users with username matching fragment
+
+        :param username_fragment: string contained in user's username
+        """
         return [
             user for user in self.get_all()
             if username_fragment in user.username
