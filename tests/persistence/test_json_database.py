@@ -2,7 +2,7 @@ from io import StringIO
 
 from pytest import fixture, raises
 
-from persistence.json_database import JsonDatabase, InvalidDatabaseFileError, CollectionDoesNotExistError
+from persistence.json_database import JsonDatabase, InvalidDatabaseFileError, CollectionDoesNotExistError, NoUuidError
 
 
 @fixture
@@ -103,6 +103,11 @@ class TestJsonDatabase:
         entity_fict_from_db = empty_database.get_by_id(entity_dict["uuid"], "users")
         assert entity_fict_from_db == entity_dict
 
+    def test_save_entity_no_uuid(self, empty_database):
+        entity_dict = {"username": "my_username"}
+        with raises(NoUuidError):
+            empty_database.save(entity_dict, "users")
+
     def test_save_overwrite_existing_entity(self, empty_database, entity_dict):
         new_entity_dict = {
             "uuid": entity_dict["uuid"],
@@ -169,6 +174,14 @@ class TestJsonDatabase:
         }]
         with raises(CollectionDoesNotExistError):
             empty_database.save_collection(collection, "payments")
+
+    def test_save_collection_no_uuid(self, empty_database):
+        collection = [
+            {"username": "entity_1"},
+            {"uuid": "3621917a-8843-11ed-bff4-00155d211f36", "username": "entity_2"}
+        ]
+        with raises(NoUuidError):
+            empty_database.save_collection(collection, "users")
 
     def test_save_empty_collection(self, empty_database):
         collection = [
