@@ -1,6 +1,6 @@
 from typing import Protocol, TypeVar, Optional, Dict, List
 
-T = TypeVar("T")
+T = TypeVar("T", covariant=True)
 
 
 class Database(Protocol):
