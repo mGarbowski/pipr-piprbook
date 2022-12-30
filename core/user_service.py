@@ -62,12 +62,11 @@ class UserService:
         )
         self.save_user(user)
 
-    def get_current_user(self) -> User:
-        return self._refresh_user_data(
-            self.__authentication.logged_in_user
-        )
+    def get_current_user(self) -> Optional[User]:
+        current_user = self.__authentication.logged_in_user
+        return self._refresh_user_data(current_user) if current_user else None
 
-    def _refresh_user_data(self, user: User) -> User:
+    def _refresh_user_data(self, user: User) -> Optional[User]:
         """Return the same user from the database, with his current state"""
         return self.get_user_by_id(user.uuid)
 
@@ -81,6 +80,9 @@ class UserService:
         self.save_user(user)
 
     def get_profile_picture(self, user: User) -> Optional[Photo]:
+        if user.profile_picture_id is None:
+            return None
+
         return self.__photo_repository.get_by_id(user.profile_picture_id)
 
     def add_profile_picture(self, user: User, photo: Photo):
@@ -93,8 +95,8 @@ class UserService:
 
     def get_friends(self, user: User) -> List[User]:
         return [
-            self.__user_repository.get_by_id(friend_id)
-            for friend_id in user.friend_uuids
+            friend for friend_id in user.friend_uuids
+            if (friend := self.__user_repository.get_by_id(friend_id)) is not None
         ]
 
     def send_message(self, from_user: User, to_user: User, text: str) -> Message:
@@ -150,14 +152,20 @@ class UserService:
         self.__friend_request_repository.delete(friend_request)
 
     def get_messages(self, user_a: User, user_b: User) -> List[Message]:
-        current_user = self.__authentication.logged_in_user
+        current_user = self.get_current_user()
+        if current_user is None:
+            raise UnauthorizedError()
+
         if user_a.uuid != current_user.uuid and user_b.uuid != current_user.uuid:
             raise UnauthorizedError()
 
         return self.__message_repository.get_messages(user_a, user_b)
 
     def _check_if_logged_in(self, user: User) -> None:
-        if user.uuid != self.__authentication.logged_in_user.uuid:
+        current_user = self.get_current_user()
+        if current_user is None:
+            raise UnauthorizedError()
+        if user.uuid != current_user.uuid:
             raise UnauthorizedError()
 
 
