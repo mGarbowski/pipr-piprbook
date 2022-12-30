@@ -86,24 +86,50 @@ class UserRepository:
 
 
 class MessageRepository:
-    def __init__(self, database: Database, serializer: JsonSerializer[Message],
-                 collection_name: str = "messages"):
+    """Class for accessing messages persisted in a database"""
+
+    def __init__(
+            self,
+            database: Database,
+            serializer: JsonSerializer[Message],
+            collection_name: str = "messages"
+    ):
+        """Create a message repository connected to the given database
+
+        :param database: database object to persist messages in
+        :param serializer: JSON serializer for messages
+        :param collection_name: name of collection in datbase, defaults to "messages"
+        """
         self.__database = database
         self.__serializer = serializer
         self.__collection_name = collection_name
 
     def save(self, message: Message):
+        """Create new message or update existing one"""
         message_json = self.__serializer.to_json(message)
         self.__database.save(message_json, self.__collection_name)
 
     def get_by_id(self, message_id: str) -> Optional[Message]:
+        """Get message by id or None if it does not exist
+
+        :param message_id: id of searched message
+        """
         message_json = self.__database.get_by_id(message_id, self.__collection_name)
         return self.__serializer.from_json(message_json) if message_json else None
 
     def delete(self, message: Message):
+        """Delete message or do nothing if it does not exist in the database"""
         self.__database.delete_by_id(message.uuid, self.__collection_name)
 
     def get_messages(self, user_a: User, user_b: User) -> List[Message]:
+        """Get all messages exchanged between two users, ordered by timestamp
+
+        Earlier messages first
+        Order of users does not matter
+
+        :param user_a: one of the users sending or receiving messages
+        :param user_b: one of the users sending or receiving messages
+        """
         messages_json = self.__database.get_collection(self.__collection_name)
         messages = [self.__serializer.from_json(message_json) for message_json in messages_json]
         messages = [msg for msg in messages if _is_message_matched(msg, user_a, user_b)]
@@ -112,6 +138,7 @@ class MessageRepository:
 
 
 def _is_message_matched(message: Message, user_a: User, user_b: User) -> bool:
+    """Return whether message was sent from one of given users to the other"""
     user_ids = (user_a.uuid, user_b.uuid)
     return message.to_user_id in user_ids and message.from_user_id in user_ids
 

@@ -1,9 +1,10 @@
+from datetime import datetime
 from unittest.mock import MagicMock
 
 from pytest import fixture
 
-from core.model import User
-from persistence.repositories import UserRepository
+from core.model import User, Message
+from persistence.repositories import UserRepository, MessageRepository
 
 
 @fixture
@@ -92,7 +93,76 @@ def users_json_collection(user_1_json, user_2_json, user_3_json):
 
 
 @fixture
-def database(user_1_json, user_2_json, user_3_json, users_json_collection):
+def message_1(user_1, user_2):
+    return Message(
+        uuid="9b3772a8-8868-11ed-942c-00155d211f36",
+        text="Hello",
+        timestamp=datetime(2022, 12, 30, 19, 30, 0),
+        from_user_id=user_1.uuid,
+        to_user_id=user_2.uuid
+    )
+
+
+@fixture
+def message_1_json():
+    return {
+        'uuid': '9b3772a8-8868-11ed-942c-00155d211f36',
+        'text': 'Hello',
+        'timestamp': '2022-12-30T19:30:00',
+        'from_user_id': 'c1a40f26-7ba9-11ed-9382-00155df7f899',
+        'to_user_id': '9a154c0c-7bba-11ed-9b3d-00155df7f899'
+    }
+
+
+@fixture
+def message_2(user_1, user_2):
+    return Message(
+        uuid="48fc2fb4-8869-11ed-942c-00155d211f36",
+        text="Hello again",
+        timestamp=datetime(2022, 12, 30, 19, 45, 0),
+        from_user_id=user_2.uuid,
+        to_user_id=user_1.uuid
+    )
+
+
+@fixture
+def message_2_json():
+    return {
+        'uuid': '48fc2fb4-8869-11ed-942c-00155d211f36',
+        'text': 'Hello again',
+        'timestamp': '2022-12-30T19:45:00',
+        'from_user_id': '9a154c0c-7bba-11ed-9b3d-00155df7f899',
+        'to_user_id': 'c1a40f26-7ba9-11ed-9382-00155df7f899'
+    }
+
+
+@fixture
+def message_serializer(message_1, message_2, message_1_json, message_2_json):
+    def to_json(message):
+        if message == message_1:
+            return message_1_json
+        elif message == message_2:
+            return message_2_json
+
+    def from_json(json_dict):
+        if json_dict == message_1_json:
+            return message_1
+        elif json_dict == message_2_json:
+            return message_2
+
+    serializer = MagicMock()
+    serializer.to_json = to_json
+    serializer.from_json = from_json
+    return serializer
+
+
+@fixture
+def message_repository(database, message_serializer):
+    return MessageRepository(database, message_serializer, "messages")
+
+
+@fixture
+def database(user_1_json, user_2_json, user_3_json, users_json_collection, message_1_json, message_2_json):
     def get_by_id(entity_id, collection_name):
         if collection_name == "users":
             if entity_id == user_1_json["uuid"]:
@@ -103,10 +173,19 @@ def database(user_1_json, user_2_json, user_3_json, users_json_collection):
                 return user_3_json
             else:
                 return None
+        elif collection_name == "messages":
+            if entity_id == message_1_json["uuid"]:
+                return message_1_json
+            elif entity_id == message_2_json["uuid"]:
+                return message_2_json
+            else:
+                return None
 
     def get_collection(collection_name):
         if collection_name == "users":
             return users_json_collection
+        elif collection_name == "messages":
+            return [message_1_json, message_2_json]
 
     database = MagicMock()
     database.get_by_id = get_by_id
@@ -183,3 +262,33 @@ class TestUserRepository:
 
     def test_get_by_username_fragment_empty(self, user_repository):
         assert user_repository.get_by_username_fragment("no match") == []
+
+
+class TestMessageRepository:
+
+    def test_save(self, message_repository, message_1, message_1_json, database):
+        message_repository.save(message_1)
+        database.save.assert_called_with(message_1_json, "messages")
+
+    def test_get_by_id(self, message_repository, message_1):
+        assert message_repository.get_by_id(message_1.uuid) == message_1
+
+    def test_by_id_does_not_exist(self, message_repository):
+        assert message_repository.get_by_id("66fb0af2-886a-11ed-942c-00155d211f36") is None
+
+    def test_delete(self, message_repository, message_1, database):
+        message_repository.delete(message_1)
+        database.delete_by_id.assert_called_with(message_1.uuid, "messages")
+
+    def test_get_messages_order_of_users_does_not_matter(self, message_repository, user_1, user_2):
+        first = message_repository.get_messages(user_2, user_1)
+        second = message_repository.get_messages(user_1, user_2)
+        assert first == second
+
+    def test_get_messages_earliest_first(self, message_repository, message_1, message_2, user_1, user_2):
+        messages = message_repository.get_messages(user_2, user_1)
+        assert messages == [message_1, message_2]
+
+    def test_get_messages_empty(self, message_repository, user_1, user_2, user_3):
+        assert message_repository.get_messages(user_1, user_3) == []
+        assert message_repository.get_messages(user_2, user_3) == []
