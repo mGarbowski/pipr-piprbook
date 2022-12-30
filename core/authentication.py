@@ -9,6 +9,8 @@ from typing import Optional
 from core.model import User
 from persistence.repositories import UserRepository
 
+SALT_LENGTH = 10
+
 
 class Authentication:
     """Class for managing user authentication
@@ -74,9 +76,29 @@ def hash_password(password: str, salt: str) -> str:
     return hashed_password
 
 
+def is_hash(text: str) -> bool:
+    """Return whether given text is a valid hash"""
+    if len(text) != 64:
+        return False
+    if any(char not in "0123456789abcdef" for char in text):
+        return False
+
+    return True
+
+
 def generate_salt() -> str:
     """Generate a random string of ascii letters"""
-    return "".join(choices(ascii_letters, k=10))
+    return "".join(choices(ascii_letters, k=SALT_LENGTH))
+
+
+def is_salt(text: str) -> bool:
+    """Return whether given text is a valid salt"""
+    if len(text) != SALT_LENGTH:
+        return False
+    if any(char not in ascii_letters for char in text):
+        return False
+
+    return True
 
 
 class LoginFailedError(Exception):
