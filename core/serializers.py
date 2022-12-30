@@ -1,16 +1,20 @@
+"""Json serialization of model classes"""
+
 from datetime import datetime
-from typing import TypeVar, Dict
+from typing import Dict
 
 from core.model import User, Message, FriendRequest, Photo
 
-T = TypeVar("T")
-
 
 class UserSerializer:
+    """Class for JSON serialization and deserializaiton of User objects"""
 
     @staticmethod
     def to_json(entity: User) -> Dict:
-        """Convert user object to JSON representation"""
+        """Convert user object to JSON representation
+
+        :param entity: user to serialize
+        """
         return {
             "uuid": entity.uuid,
             "username": entity.username,
@@ -26,7 +30,8 @@ class UserSerializer:
     def from_json(json_dict: Dict) -> User:
         """Create user object from its JSON representation
 
-        :raises RepresentationError: if given json is not a valid representation of a user
+        :param json_dict: dictionary representation of a user
+        :raises RepresentationError: if json_dict is not a valid representation of a user
         """
         try:
             return User(
@@ -44,11 +49,15 @@ class UserSerializer:
 
 
 class MessageSerializer:
+    """Class for JSON serialization and deserializaiton of Message objects"""
+
     @staticmethod
     def to_json(entity: Message) -> Dict:
         """Convert a message object to JSON representation
 
         Timestamps are stored as ISO-format strings
+
+        :param entity: message to serialize
         """
         return {
             "uuid": entity.uuid,
@@ -62,7 +71,8 @@ class MessageSerializer:
     def from_json(json_dict: Dict) -> Message:
         """Create a message object from its JSON representation
 
-        :raises RepresentationError: if json is not a valid representation of a message
+        :param json_dict: dictionary representation of a message
+        :raises RepresentationError: if json_dict is not a valid representation of a message
         """
         try:
             return Message(
@@ -77,11 +87,15 @@ class MessageSerializer:
 
 
 class FriendRequestSerializer:
+    """Class for JSON serialization and deserializaiton of FriendRequest objects"""
+
     @staticmethod
     def to_json(entity: FriendRequest) -> Dict:
         """Convert a friend request object to a JSON representation
 
         Timestamps are stored as ISO-format strings
+
+        :param entity: friend request to serializer
         """
         return {
             "uuid": entity.uuid,
@@ -94,7 +108,8 @@ class FriendRequestSerializer:
     def from_json(json_dict: Dict) -> FriendRequest:
         """Create a friend request object from its JSON representation
 
-        :raises RepresentationError: if json is not a valid representation of a friend request
+        :param json_dict: dictionary representation of a friend request
+        :raises RepresentationError: if json_dict is not a valid representation of a friend request
         """
         try:
             return FriendRequest(
@@ -108,10 +123,14 @@ class FriendRequestSerializer:
 
 
 class PhotoSerializer:
+    """Class for JSON serialization and deserializaiton of Photo objects"""
 
     @staticmethod
     def to_json(entity: Photo) -> Dict:
-        """Convert a Photo object to a JSON representation"""
+        """Convert a Photo object to a JSON representation
+
+        :param entity: photo to serializer
+        """
         return {
             "uuid": entity.uuid,
             "filename": entity.filename,
@@ -121,6 +140,11 @@ class PhotoSerializer:
 
     @staticmethod
     def from_json(json_dict: Dict) -> Photo:
+        """Create a Photo object from its JSON representation
+
+        :param json_dict: dictionary representation of a photo
+        :raises RepresentationError: if json_dict is not a valid representation of a friend request
+        """
         try:
             return Photo(
                 uuid=json_dict["uuid"],
@@ -133,8 +157,8 @@ class PhotoSerializer:
 
 
 class RepresentationError(Exception):
-    """Exception signaling invalid representation of an object"""
+    """Exception signaling invalid representation of an entity"""
 
     def __init__(self, json):
-        super().__init__("Received invalid representation of an object")
+        super().__init__("Received invalid representation of an entity")
         self.json = json

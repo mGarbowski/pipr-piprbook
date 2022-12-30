@@ -2,8 +2,9 @@ from datetime import datetime
 
 from pytest import raises
 
-from core.model import User, Message, FriendRequest
-from core.serializers import UserSerializer, RepresentationError, MessageSerializer, FriendRequestSerializer
+from core.model import User, Message, FriendRequest, Photo
+from core.serializers import UserSerializer, RepresentationError, MessageSerializer, FriendRequestSerializer, \
+    PhotoSerializer
 
 
 class TestUserSerializer:
@@ -216,3 +217,46 @@ class TestFriendRequestSerializer:
                 "adfhaslf": "adfnkaslf",
                 "sagnfamf": []
             })
+
+
+class TestPhotoSerializer:
+
+    def test_to_json(self):
+        photo = Photo(
+            uuid="2c23e9ae-8850-11ed-942c-00155d211f36",
+            filename="picture.jpg",
+            format="jpg",
+            binary_data_hex="deadbeef0123456789"
+        )
+        serializer = PhotoSerializer()
+        photo_json = serializer.to_json(photo)
+        assert photo_json == {
+            "uuid": "2c23e9ae-8850-11ed-942c-00155d211f36",
+            "filename": "picture.jpg",
+            "format": "jpg",
+            "binary_data_hex": "deadbeef0123456789"
+        }
+
+    def test_from_json(self):
+        photo_json = {
+            "uuid": "2c23e9ae-8850-11ed-942c-00155d211f36",
+            "filename": "picture.jpg",
+            "format": "jpg",
+            "binary_data_hex": "deadbeef0123456789"
+        }
+        serializer = PhotoSerializer()
+        photo = serializer.from_json(photo_json)
+        assert photo == Photo(
+            uuid="2c23e9ae-8850-11ed-942c-00155d211f36",
+            filename="picture.jpg",
+            format="jpg",
+            binary_data_hex="deadbeef0123456789"
+        )
+
+    def test_invalid_representation(self):
+        with raises(RepresentationError):
+            PhotoSerializer.from_json({
+                "asdfasf": "ASfdsaf",
+                "ds;hfnlds": []
+            })
+
