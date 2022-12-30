@@ -46,6 +46,14 @@ pip install -r requirements.txt
 
 ### Uruchomienie testów
 
+Testy jednostkowe
+
 ```bash
 pytest ./tests
+```
+
+Sprawdzenie typów
+
+```bash
+mypy core persistence gui
 ```
