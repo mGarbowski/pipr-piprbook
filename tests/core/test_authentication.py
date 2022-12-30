@@ -4,8 +4,8 @@ from pytest import raises, fixture
 
 from core.authentication import Authentication, IncorrectPasswordError, UserDoesNotExistError, hash_password, \
     generate_salt
-from core.validation import is_hash, is_salt
 from core.model import User
+from core.validation import is_hash, is_salt
 from persistence.repositories import UserRepository
 
 
@@ -132,26 +132,11 @@ class TestHashPassword:
         second_hash = hash_password("same_password", "different_salt_2")
         assert first_hash != second_hash
 
-    def test_is_hash(self):
-        assert is_hash("6fe6021f948f23a378d338e5aae048b05bbf2a796101e6e5b10cf15dd0917a2a")
-
-    def test_is_not_hash(self):
-        assert not is_hash("6fe6021f948f23a378d338e5aae048b05bbf2a796101e6e5b10cf15dd0917a2")
-        assert not is_hash("gfe6021f948f23a378d338e5aae048b05bbf2a796101e6e5b10cf15dd0917a2a")
-
     def test_generated_is_hash(self):
         assert is_hash(hash_password("same_password", "some_salt"))
 
 
 class TestSalt:
-
-    def test_is_salt(self):
-        assert is_salt("afgsASFmpN")
-
-    def test_is_not_salt(self):
-        assert not is_salt("afgsASFmpNa")
-        assert not is_salt("afgsASFmp")
-        assert not is_salt("123;,afds0")
 
     def test_generated_is_salt(self):
         assert is_salt(generate_salt())
