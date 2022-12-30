@@ -4,9 +4,18 @@ from io import BytesIO
 from pytest import raises
 
 from core.model import User, Message, FriendRequest, Photo
-from core.validation import IncorrectUuidError, IncorrectUsernameError, IncorrectEmailError, IncorrectPasswordHashError, \
-    IncorrectSaltError, IncorrectMessageTextError, SelfReferenceError, IncorrectFilenameError, \
-    IncorrectHexRepresentationError, UnsupportedFileFormatError
+from core.validation import (
+    IncorrectUuidError,
+    IncorrectUsernameError,
+    IncorrectEmailError,
+    IncorrectPasswordHashError,
+    IncorrectSaltError,
+    IncorrectMessageTextError,
+    SelfReferenceError,
+    IncorrectFilenameError,
+    IncorrectHexRepresentationError,
+    UnsupportedFileFormatError
+)
 
 
 class TestUser:
