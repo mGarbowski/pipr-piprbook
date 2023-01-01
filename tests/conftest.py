@@ -186,6 +186,16 @@ def photo_1():
 
 
 @fixture
+def photo_2():
+    return Photo(
+        uuid="8af8fc5e-8a02-11ed-8f81-00155d211d29",
+        filename="picture.png",
+        format="png",
+        binary_data_hex="1759805982659826165"
+    )
+
+
+@fixture
 def photo_1_json():
     return {
         'uuid': 'd9eaaf36-8874-11ed-942c-00155d211f36',

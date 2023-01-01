@@ -139,12 +139,23 @@ class TestUserService:
         assert photo == photo_1
 
     def test_add_profile_picture(self, user_service, user_repository, photo_repository, user_1, photo_1):
+        user_service.log_in_user(user_1.username, "password")
         expected = user_1
         expected.profile_picture_id = photo_1.uuid
 
         user_service.add_profile_picture(user_1, photo_1)
         user_repository.save.assert_called_once_with(expected)
         photo_repository.save.assert_called_once_with(photo_1)
+
+    def test_add_profile_picture_log_in_required(self, user_service, user_1, photo_1):
+        with raises(UnauthorizedError):
+            user_service.add_profile_picture(user_1, photo_1)
+
+    def test_add_profile_picture_deletes_previous(self, user_service, photo_repository, user_1, photo_1, photo_2):
+        user_service.log_in_user(user_1.username, "password")
+        user_service.add_profile_picture(user_1, photo_1)
+        user_service.add_profile_picture(user_1, photo_2)
+        photo_repository.delete.assert_called_once_with(photo_1)
 
     def test_delete_photo(self, user_service, photo_repository, photo_1):
         user_service.delete_picture(photo_1)
@@ -206,6 +217,23 @@ class TestUserService:
         user_repository.save.assert_any_call(user_1_expected)
         user_repository.save.assert_any_call(user_2_expected)
         friend_request_repository.delete.assert_called_once_with(request)
+
+    def test_accept_friend_request_requires_log_in(self, user_service, user_1, user_2):
+        request = FriendRequest("4b30d26a-8a05-11ed-8f81-00155d211d29",
+                                datetime.now(), user_2.uuid, user_1.uuid)
+        with raises(UnauthorizedError):
+            user_service.accept_friend_request(request)
+
+    def test_accept_friend_request_non_existing_users(self, user_service, user_1):
+        user_service.log_in_user(user_1.username, "password")
+        request = FriendRequest(
+            uuid="4b30d26a-8a05-11ed-8f81-00155d211d29",
+            timestamp=datetime.now(),
+            from_user_id="939475ca-8a05-11ed-8f81-00155d211d29",
+            to_user_id=user_1.uuid)
+
+        with raises(ValueError):
+            user_service.accept_friend_request(request)
 
     def test_delete_friend_request(self, user_service, request_1, friend_request_repository):
         user_service.delete_friend_request(request_1)

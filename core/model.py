@@ -41,6 +41,7 @@ class User:
         """Validate parameters
 
         :raises IncorrectUuidError: if uuid, profile_picure_id or any of friend_uuids is not a valid uuid
+        :raises IncorrectUsernameError: if username is shorter than 4 characters
         :raises IncorrectEmailError: if email is not a correct email address
         :raises IncorrectPasswordHashError: if password_hash is not a valid sha256 hash
         :raises IncorrectSaltError: if salt has wrong length or illegal characters
