@@ -32,6 +32,11 @@ W katalogu projektu
 python -m gui.main {ścieżka do pliku z bazą danych}
 ```
 
+Przykładowy plik z pustą bazą danych znajduje się w katalogu `examples`
+```bash
+python -m gui.main examples/empty-db.json
+```
+
 ### Zainstalowanie zależności
 
 ```bash
