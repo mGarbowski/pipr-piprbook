@@ -2,8 +2,9 @@
 
 from datetime import datetime
 
-from core.model import User, Message, FriendRequest, Photo
 from pytest import fixture
+
+from core.model import User, Message, FriendRequest, Photo
 
 
 @fixture
