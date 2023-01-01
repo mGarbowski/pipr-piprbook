@@ -1,5 +1,5 @@
 import sys
-from enum import Enum
+from typing import Callable
 
 from PySide2.QtCore import QByteArray
 from PySide2.QtGui import QPixmap
@@ -7,37 +7,33 @@ from PySide2.QtWidgets import QApplication, QWidget, QFileDialog, QListWidgetIte
 
 from core.factory import get_user_service_default
 from core.model import Photo
-from core.user_service import UserService, UsernameTakenException, EmailAlreadyUsedException, RegistrationException
+from core.user_service import UserService, UsernameTakenException, EmailAlreadyUsedException
 from gui.resources.resources import get_placeholder_picture
 from gui.ui_components.ui_invite_friends_page import Ui_InviteFriendsPage
 from gui.ui_components.ui_login_window import Ui_LoginWindow
 from gui.ui_components.ui_main_window import Ui_MainWindow
 from gui.ui_components.ui_messenger_page import Ui_MessengerPage
 from gui.ui_components.ui_profile_page import Ui_ProfilePage
+from ui_components.ui_login_page import Ui_LoginPage
+from ui_components.ui_register_page import Ui_RegisterPage
+from core.validation import IncorrectUsernameError, IncorrectEmailError
 
 
-class LoginWindowPages(Enum):
-    LOGIN = 0
-    REGISTER = 1
-    HOME = 2
+class LoginPage(QWidget):
 
-
-class LoginWindow(QMainWindow):
-    def __init__(self, user_service: UserService, parent=None):
+    def __init__(self, user_service: UserService, to_register_page: Callable, close_window: Callable, parent=None):
         super().__init__(parent)
-        self.ui = Ui_LoginWindow()
-        self.ui.setupUi(self)
+        self.ui = Ui_LoginPage()
         self.user_service = user_service
+        self.to_register_page = to_register_page
+        self.close_window = close_window
 
-        self.ui.stackedWidget.setCurrentIndex(LoginWindowPages.LOGIN.value)
-        self._setup_login_page()
-        self._setup_register_page()
+        self.ui.setupUi(self)
+        self._setup()
 
-    def _setup_login_page(self):
+    def _setup(self):
         self.ui.log_in_button.clicked.connect(self._log_in_user)
-        self.ui.register_button.clicked.connect(
-            lambda: self.ui.stackedWidget.setCurrentIndex(LoginWindowPages.REGISTER.value)
-        )
+        self.ui.register_button.clicked.connect(self.to_register_page)
         self.ui.login_failed_text.setText("")
 
     def _log_in_user(self):
@@ -51,49 +47,81 @@ class LoginWindow(QMainWindow):
             self.ui.username_input.setText("")
             self.ui.password_input.setText("")
 
-    def _setup_register_page(self):
-        self.ui.create_account_button.clicked.connect(self._register_user)
-        self._clear_registration_form()
-        self.ui.back_to_login_button.clicked.connect(
-            lambda: self.ui.stackedWidget.setCurrentIndex(LoginWindowPages.LOGIN.value)
-        )
+    def _open_main_window(self):
+        self.main_window = MainWindow(self.user_service)
+        self.main_window.show()
+        self.close_window()
+
+
+class RegisterPage(QWidget):
+
+    def __init__(self, user_service: UserService, to_login_page: Callable, parent=None):
+        super().__init__(parent)
+        self.ui = Ui_RegisterPage()
+        self.user_service = user_service
+        self.to_login_page = to_login_page
+
+        self.ui.setupUi(self)
+        self._setup()
+
+    def _setup(self):
+        self.ui.register_button.clicked.connect(self._register_user)
+        self.ui.back_button.clicked.connect(self.to_login_page)
+        self._clear_form()
+
+    def _clear_form(self):
+        self.ui.registration_failed_text.setText("")
+        self.ui.username_input.setText("")
+        self.ui.email_input.setText("")
+        self.ui.password_input.setText("")
+        self.ui.confirm_password_input.setText("")
+
+    def _show_message(self, message: str):
+        self.ui.registration_failed_text.setText(message)
 
     def _register_user(self):
-        username = self.ui.username_input_2.text()
+        username = self.ui.username_input.text()
         email = self.ui.email_input.text()
-        password = self.ui.password_input_2.text()
+        password = self.ui.password_input.text()
         repeated_password = self.ui.confirm_password_input.text()
+        self._clear_form()
 
         if password != repeated_password:
-            self._clear_registration_form()
-            self.ui.registration_failed_message.setText("Passwords do not match")
+            self.ui.registration_failed_text.setText("Passwords do not match")
             return
 
         try:
             self.user_service.register_new_user(username, email, password)
-            self.ui.stackedWidget.setCurrentIndex(LoginWindowPages.LOGIN.value)
-            self._clear_registration_form()
+            self.to_login_page()
         except UsernameTakenException:
-            self._clear_registration_form()
-            self.ui.registration_failed_message.setText("Username is already taken")
+            self._show_message("Username is already taken")
         except EmailAlreadyUsedException:
-            self._clear_registration_form()
-            self.ui.registration_failed_message.setText("Email address is already used by an existing account")
-        except RegistrationException:
-            self._clear_registration_form()
-            self.ui.registration_failed_message.setText("Registration failed")
+            self._show_message("Email address is already used by an existing account")
+        except IncorrectUsernameError:
+            self._show_message("Username must be at least 4 characters long")
+        except IncorrectEmailError:
+            self._show_message("Incorrect email address")
 
-    def _clear_registration_form(self):
-        self.ui.registration_failed_message.setText("")
-        self.ui.username_input_2.setText("")
-        self.ui.email_input.setText("")
-        self.ui.password_input_2.setText("")
-        self.ui.confirm_password_input.setText("")
 
-    def _open_main_window(self):
-        self.main_window = MainWindow(self.user_service)
-        self.main_window.show()
-        self.hide()
+class LoginWindow(QMainWindow):
+    def __init__(self, user_service: UserService, parent=None):
+        super().__init__(parent)
+        self.ui = Ui_LoginWindow()
+        self.ui.setupUi(self)
+        self.user_service = user_service
+
+        self.login_page = LoginPage(user_service, self._to_register_page, self.hide)
+        self.register_page = RegisterPage(user_service, self._to_login_page)
+        self.login_page_idx = self.ui.pages.addWidget(self.login_page)
+        self.register_page_idx = self.ui.pages.addWidget(self.register_page)
+
+        self.ui.pages.setCurrentIndex(self.login_page_idx)
+
+    def _to_register_page(self):
+        self.ui.pages.setCurrentIndex(self.register_page_idx)
+
+    def _to_login_page(self):
+        self.ui.pages.setCurrentIndex(self.login_page_idx)
 
 
 class ProfilePage(QWidget):
