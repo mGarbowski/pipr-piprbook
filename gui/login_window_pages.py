@@ -4,7 +4,9 @@ from typing import Callable
 
 from PySide2.QtWidgets import QWidget
 
-from core.user_service import UserService, UsernameTakenException, EmailAlreadyUsedException
+from core.user_service import (
+    UserService, UsernameTakenException, EmailAlreadyUsedException
+)
 from core.validation import IncorrectUsernameError, IncorrectEmailError
 from gui.ui_components.ui_login_page import Ui_LoginPage
 from gui.ui_components.ui_register_page import Ui_RegisterPage
@@ -13,7 +15,12 @@ from gui.ui_components.ui_register_page import Ui_RegisterPage
 class LoginPage(QWidget):
     """Page for user login"""
 
-    def __init__(self, user_service: UserService, to_register_page: Callable, open_main_window: Callable, parent=None):
+    def __init__(
+            self,
+            user_service: UserService,
+            to_register_page: Callable,
+            open_main_window: Callable, parent=None
+    ):
         """Create login page
 
         :param user_service: user service to provide login logic
@@ -53,7 +60,12 @@ class LoginPage(QWidget):
 class RegisterPage(QWidget):
     """Page for user registration"""
 
-    def __init__(self, user_service: UserService, to_login_page: Callable, parent=None):
+    def __init__(
+            self,
+            user_service: UserService,
+            to_login_page: Callable,
+            parent=None
+    ):
         """Create registration page
 
         :param user_service: user service handling registration logic
@@ -87,7 +99,7 @@ class RegisterPage(QWidget):
         self.ui.registration_failed_text.setText(message)
 
     def _register_user(self):
-        """Attempt to register user with given credentials, display message on failure"""
+        """Attempt to register user with given credentials"""
         username = self.ui.username_input.text()
         email = self.ui.email_input.text()
         password = self.ui.password_input.text()
@@ -104,7 +116,9 @@ class RegisterPage(QWidget):
         except UsernameTakenException:
             self._show_message("Username is already taken")
         except EmailAlreadyUsedException:
-            self._show_message("Email address is already used by an existing account")
+            self._show_message(
+                "Email address is already used by an existing account"
+            )
         except IncorrectUsernameError:
             self._show_message("Username must be at least 4 characters long")
         except IncorrectEmailError:

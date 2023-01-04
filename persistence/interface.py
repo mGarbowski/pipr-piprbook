@@ -14,7 +14,9 @@ class Database(Protocol):
         """Create new entity or update existing"""
         ...
 
-    def get_by_id(self, entity_id: str, collection_name: str) -> Optional[Dict]:
+    def get_by_id(
+            self, entity_id: str, collection_name: str
+    ) -> Optional[Dict]:
         """Get entity dictionary by id or None if it does not exist"""
         ...
 
@@ -23,7 +25,7 @@ class Database(Protocol):
         ...
 
     def save_collection(self, collection: List[Dict], collection_name: str):
-        """Save a collection of entity dictionaries, overwriting all existing"""
+        """Save a collection of entity dictionaries, overwrite all existing"""
         ...
 
     def get_collection(self, collection_name: str) -> List[Dict]:

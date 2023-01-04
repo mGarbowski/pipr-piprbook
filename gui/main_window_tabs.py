@@ -39,15 +39,19 @@ class ProfilePage(QWidget):
         self.ui.profile_header.setText(f"{user.username}'s profile")
         self.ui.username_display.setText(f"Username: {user.username}")
         self.ui.email_display.setText(f"Email address: {user.email}")
-        self.ui.bio_display.setText(f"Bio: {user.bio}" if user.bio else "No bio set")
+        self.ui.bio_display.setText(
+            f"Bio: {user.bio}" if user.bio else "No bio set"
+        )
 
         self._display_profile_picture()
 
         self.ui.update_bio_button.clicked.connect(self._update_user_bio)
-        self.ui.upload_profile_picture_button.clicked.connect(self._upload_profile_picture)
+        self.ui.upload_profile_picture_button.clicked.connect(
+            self._upload_profile_picture
+        )
 
     def _upload_profile_picture(self):
-        """Select photo from the filesystem and set as user's new profile picture"""
+        """Select photo and set as user's new profile picture"""
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.AnyFile)
         file_path, _ = file_dialog.getOpenFileName()
@@ -80,10 +84,13 @@ class ProfilePage(QWidget):
         """Display user's profile picture or a placeholder if not set"""
         user = self.user_service.get_current_user()
         profile_picture = self.user_service.get_profile_picture(user)
-        profile_picture_bytes = profile_picture.get_bytes() if profile_picture else get_placeholder_picture()
+        if profile_picture:
+            picture_bytes = profile_picture.get_bytes()
+        else:
+            picture_bytes = get_placeholder_picture()
 
         pixmap = QPixmap()
-        pixmap.loadFromData(QByteArray(profile_picture_bytes))
+        pixmap.loadFromData(QByteArray(picture_bytes))
         self.ui.profile_picture.setPixmap(pixmap)
 
 
@@ -93,7 +100,8 @@ class MessengerPage(QWidget):
     def __init__(self, user_service: UserService, parent=None):
         """Create messenger page
 
-        :param user_service: user service handling sending and retreiving messages
+        :param user_service: user service handling sending
+            and retreiving messages
         :param parent: parent widget
         """
         super().__init__(parent)
@@ -139,7 +147,9 @@ class MessengerPage(QWidget):
         friend_bio = self.__friend.bio if self.__friend.bio else ""
         self.ui.friend_bio.setText(friend_bio)
 
-        friend_profile_picture = self.user_service.get_profile_picture(self.__friend)
+        friend_profile_picture = self.user_service.get_profile_picture(
+            self.__friend
+        )
         if friend_profile_picture is not None:
             pixmap = QPixmap()
             pixmap.loadFromData(QByteArray(friend_profile_picture.get_bytes()))
@@ -188,7 +198,7 @@ class MessengerPage(QWidget):
 
 
 class InviteFriendsPage(QWidget):
-    """Page for inviting friends, accepting received invitations and viewing sent invitations"""
+    """Page for managing friend invitations"""
 
     def __init__(self, user_service: UserService, parent=None):
         """Create page for inviting friends
@@ -226,8 +236,12 @@ class InviteFriendsPage(QWidget):
         self.ui.cancel_button.clicked.connect(self._cancel_sent_invitation)
 
         self.ui.search_result.itemClicked.connect(self._select_user)
-        self.ui.awaiting_invitations.itemClicked.connect(self._select_awaiting_invitation)
-        self.ui.sent_invitations.itemClicked.connect(self._select_sent_invitation)
+        self.ui.awaiting_invitations.itemClicked.connect(
+            self._select_awaiting_invitation
+        )
+        self.ui.sent_invitations.itemClicked.connect(
+            self._select_sent_invitation
+        )
 
     def _select_user(self, item: QListWidgetItem):
         """Select user from search result"""
@@ -239,16 +253,28 @@ class InviteFriendsPage(QWidget):
 
         current_user = self.user_service.get_current_user()
         username_fragment = self.ui.search_bar.text()
-        sent_invitations = self.user_service.get_friend_requests_from(current_user)
-        invited_user_ids = [invitation.to_user_id for invitation in sent_invitations]
-        awaiting_invitations = self.user_service.get_friend_requests_to(current_user)
-        already_invited_by_ids = [invitation.from_user_id for invitation in awaiting_invitations]
+        sent_invitations = self.user_service.get_friend_requests_from(
+            current_user
+        )
+        invited_user_ids = [invitation.to_user_id
+                            for invitation in sent_invitations]
+        awaiting_invitations = self.user_service.get_friend_requests_to(
+            current_user
+        )
+        already_invited_by_ids = [invitation.from_user_id
+                                  for invitation in awaiting_invitations]
 
-        users = self.user_service.get_users_by_username_fragment(username_fragment)
-        users = [user for user in users if user.uuid != current_user.uuid]
-        users = [user for user in users if not current_user.is_friends_with(user)]
-        users = [user for user in users if user.uuid not in invited_user_ids]
-        users = [user for user in users if user.uuid not in already_invited_by_ids]
+        users = self.user_service.get_users_by_username_fragment(
+            username_fragment
+        )
+        users = [user for user in users
+                 if user.uuid != current_user.uuid]
+        users = [user for user in users
+                 if not current_user.is_friends_with(user)]
+        users = [user for user in users
+                 if user.uuid not in invited_user_ids]
+        users = [user for user in users
+                 if user.uuid not in already_invited_by_ids]
 
         for user in users:
             item = QListWidgetItem(user.username)
@@ -261,7 +287,9 @@ class InviteFriendsPage(QWidget):
             return
 
         current_user = self.user_service.get_current_user()
-        self.user_service.send_friend_request(current_user, self.__selected_user)
+        self.user_service.send_friend_request(
+            current_user, self.__selected_user
+        )
         self._search_users()
         self._display_sent_invitations()
 
@@ -274,9 +302,13 @@ class InviteFriendsPage(QWidget):
         self.ui.awaiting_invitations.clear()
 
         current_user = self.user_service.get_current_user()
-        awaiting_invitations = self.user_service.get_friend_requests_to(current_user)
+        awaiting_invitations = self.user_service.get_friend_requests_to(
+            current_user
+        )
         for invitation in awaiting_invitations:
-            from_user = self.user_service.get_user_by_id(invitation.from_user_id)
+            from_user = self.user_service.get_user_by_id(
+                invitation.from_user_id
+            )
             item = QListWidgetItem(from_user.username)
             item.invitation = invitation
             self.ui.awaiting_invitations.addItem(item)
@@ -307,7 +339,9 @@ class InviteFriendsPage(QWidget):
         """Display invitations sent by the logged-in user"""
         self.ui.sent_invitations.clear()
         current_user = self.user_service.get_current_user()
-        sent_invitations = self.user_service.get_friend_requests_from(current_user)
+        sent_invitations = self.user_service.get_friend_requests_from(
+            current_user
+        )
         for invitation in sent_invitations:
             to_user = self.user_service.get_user_by_id(invitation.to_user_id)
             list_item = QListWidgetItem(to_user.username)

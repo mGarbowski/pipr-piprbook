@@ -31,7 +31,8 @@ class UserSerializer:
         """Create user object from its JSON representation
 
         :param json_dict: dictionary representation of a user
-        :raises RepresentationError: if json_dict is not a valid representation of a user
+        :raises RepresentationError: if json_dict is not a
+            valid representation of a user
         """
         try:
             return User(
@@ -72,7 +73,8 @@ class MessageSerializer:
         """Create a message object from its JSON representation
 
         :param json_dict: dictionary representation of a message
-        :raises RepresentationError: if json_dict is not a valid representation of a message
+        :raises RepresentationError: if json_dict is not a
+            valid representation of a message
         """
         try:
             return Message(
@@ -87,7 +89,7 @@ class MessageSerializer:
 
 
 class FriendRequestSerializer:
-    """Class for JSON serialization and deserializaiton of FriendRequest objects"""
+    """Class for JSON serialization of FriendRequest objects"""
 
     @staticmethod
     def to_json(entity: FriendRequest) -> Dict:
@@ -109,7 +111,8 @@ class FriendRequestSerializer:
         """Create a friend request object from its JSON representation
 
         :param json_dict: dictionary representation of a friend request
-        :raises RepresentationError: if json_dict is not a valid representation of a friend request
+        :raises RepresentationError: if json_dict is not a
+            valid representation of a friend request
         """
         try:
             return FriendRequest(
@@ -143,7 +146,8 @@ class PhotoSerializer:
         """Create a Photo object from its JSON representation
 
         :param json_dict: dictionary representation of a photo
-        :raises RepresentationError: if json_dict is not a valid representation of a friend request
+        :raises RepresentationError: if json_dict is not a
+            valid representation of a friend request
         """
         try:
             return Photo(

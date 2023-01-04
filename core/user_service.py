@@ -3,7 +3,8 @@
 from datetime import datetime
 from typing import Optional, List
 
-from core.authentication import Authentication, UnauthorizedError, LoginFailedError, hash_password, generate_salt
+from core.authentication import Authentication, UnauthorizedError, \
+    LoginFailedError, hash_password, generate_salt
 from core.identifiers import generate_uuid
 from core.model import FriendRequest, Message, User, Photo
 from persistence.repositories import (
@@ -14,8 +15,11 @@ from persistence.repositories import (
 class UserService:
     """Class for performing operations on users
 
-    Some operations require authorization, authentication and authorization logic is delegated to Authentication object.
-    Attempt to perform an action without appropriate permissions raises core.authentication.UnauthorizedError.
+    Some operations require authorization,
+        authentication and authorization logic is delegated
+        to the Authentication object.
+    Attempt to perform an action without appropriate permissions
+        raises core.authentication.UnauthorizedError.
     """
 
     def __init__(
@@ -26,7 +30,7 @@ class UserService:
             friend_request_repository: FriendRequestRepository,
             photo_repository: PhotoRepository
     ) -> None:
-        """Create user service instance with dependencies provided as arguments"""
+        """Create user service instance with given dependencies"""
         self.__authentication = authentication
         self.__user_repository = user_repository
         self.__message_repository = message_repository
@@ -53,14 +57,20 @@ class UserService:
         """Get user by id or None if not found"""
         return self.__user_repository.get_by_id(user_id)
 
-    def get_users_by_username_fragment(self, username_fragment: str) -> List[User]:
+    def get_users_by_username_fragment(
+            self, username_fragment: str
+    ) -> List[User]:
         """Get all users with usernames matching given fragment
 
         :param username_fragment: exact text contained in users' usernames
         """
-        return self.__user_repository.get_by_username_fragment(username_fragment)
+        return self.__user_repository.get_by_username_fragment(
+            username_fragment
+        )
 
-    def register_new_user(self, username: str, email: str, password: str) -> None:
+    def register_new_user(
+            self, username: str, email: str, password: str
+    ) -> None:
         """Attempt to create new user with given credentials
 
         Raises appropriate exceptions on invalid credentials
@@ -69,9 +79,12 @@ class UserService:
         :param email: email address, cannot be used by an existing user
         :param password: password in plain text
 
-        :raises UsernameTakenException: if given username is already used by some other user
-        :raises EmailAlreadyUsedException: if given email address is already used by some existing user
-        :raises IncorrectUsernameError: if username is shorter than 4 characters
+        :raises UsernameTakenException: if given username is already
+            used by some other user
+        :raises EmailAlreadyUsedException: if given email address is already
+            used by some existing user
+        :raises IncorrectUsernameError: if username is shorter
+            than 4 characters
         :raises IncorrectEmailError: if email is not a correct email address
         """
         if self.__user_repository.get_by_username(username) is not None:
@@ -93,7 +106,8 @@ class UserService:
     def get_current_user(self) -> Optional[User]:
         """Get currently logged-in user or None if nobody is logged-in
 
-        Refreshes user data from the database to avoid comparisons with stale information
+        Refreshes user data from the database to avoid
+            comparisons with stale information
         """
         current_user = self.__authentication.logged_in_user
         return self._refresh_user_data(current_user) if current_user else None
@@ -153,8 +167,8 @@ class UserService:
         List can be in any order
         """
         return [
-            friend for friend_id in user.friend_uuids
-            if (friend := self.__user_repository.get_by_id(friend_id)) is not None
+            friend for uuid in user.friend_uuids
+            if (friend := self.__user_repository.get_by_id(uuid)) is not None
         ]
 
     def send_message(self, from_user: User, to_user: User, text: str) -> None:
@@ -202,7 +216,9 @@ class UserService:
         self._check_if_logged_in(user)
         return self.__friend_request_repository.get_requests_to_user(user)
 
-    def send_friend_request(self, from_user: User, to_user: User) -> FriendRequest:
+    def send_friend_request(
+            self, from_user: User, to_user: User
+    ) -> FriendRequest:
         """Send a friend request from one user to another
 
         Requires sending user to be logged-in
@@ -231,9 +247,12 @@ class UserService:
 
         :raises UnauthorizedError: if user is not logged-in
         :raises ValueError: if friend requests refers to non-existing users
-        :raises AlreadyFriendsException: if sending and receiving users are already friends
+        :raises AlreadyFriendsException: if sending and receiving
+            users are already friends
         """
-        from_user = self.__user_repository.get_by_id(friend_request.from_user_id)
+        from_user = self.__user_repository.get_by_id(
+            friend_request.from_user_id
+        )
         to_user = self.__user_repository.get_by_id(friend_request.to_user_id)
         if to_user is None or from_user is None:
             raise ValueError("There are no users with given IDs")
@@ -269,7 +288,8 @@ class UserService:
         if current_user is None:
             raise UnauthorizedError()
 
-        if user_a.uuid != current_user.uuid and user_b.uuid != current_user.uuid:
+        if user_a.uuid != current_user.uuid \
+                and user_b.uuid != current_user.uuid:
             raise UnauthorizedError()
 
         return self.__message_repository.get_messages(user_a, user_b)

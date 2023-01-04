@@ -38,7 +38,10 @@ class BaseRepository(ABC, Generic[T]):
 
         :param entity_id: id of searched entity
         """
-        entity_dict = self._database.get_by_id(entity_id, self._collection_name)
+        entity_dict = self._database.get_by_id(
+            entity_id,
+            self._collection_name
+        )
         return self._serializer.from_json(entity_dict) if entity_dict else None
 
     def delete(self, entity: T):
@@ -62,14 +65,16 @@ class UserRepository(BaseRepository[User]):
 
         :param database: database object to persist users in
         :param serializer: JSON serializer for users
-        :param collection_name: name of collection in datbase, defaults to "users"
+        :param collection_name: name of collection in datbase,
+            defaults to "users"
         """
         super().__init__(database, serializer, collection_name)
 
     def get_all(self) -> List[User]:
         """Get all users"""
         users_json = self._database.get_collection(self._collection_name)
-        users = [self._serializer.from_json(user_json) for user_json in users_json]
+        users = [self._serializer.from_json(user_json) for user_json in
+                 users_json]
         return users
 
     def get_by_username(self, username: str) -> Optional[User]:
@@ -116,7 +121,8 @@ class MessageRepository(BaseRepository[Message]):
 
         :param database: database object to persist messages in
         :param serializer: JSON serializer for messages
-        :param collection_name: name of collection in datbase, defaults to "messages"
+        :param collection_name: name of collection in datbase,
+        defaults to "messages"
         """
         super().__init__(database, serializer, collection_name)
 
@@ -130,8 +136,14 @@ class MessageRepository(BaseRepository[Message]):
         :param user_b: one of the users sending or receiving messages
         """
         messages_json = self._database.get_collection(self._collection_name)
-        messages = [self._serializer.from_json(message_json) for message_json in messages_json]
-        messages = [msg for msg in messages if _is_message_matched(msg, user_a, user_b)]
+        messages = [
+            self._serializer.from_json(message_json)
+            for message_json in messages_json
+        ]
+        messages = [
+            msg for msg in messages
+            if _is_message_matched(msg, user_a, user_b)
+        ]
         messages = sorted(messages, key=lambda msg: msg.timestamp)
         return messages
 
@@ -155,7 +167,8 @@ class FriendRequestRepository(BaseRepository[FriendRequest]):
 
         :param database: database to persist friend requests in
         :param serializer: JSON serializer for friend requests
-        :param collection_name: collection name in the database, default to "friend_requests"
+        :param collection_name: collection name in the database,
+            defaults to "friend_requests"
         """
         super().__init__(database, serializer, collection_name)
 
@@ -175,14 +188,20 @@ class FriendRequestRepository(BaseRepository[FriendRequest]):
         :param from_user: user sending friend requests
         """
         requests = self._get_all_requests()
-        requests = [req for req in requests if req.from_user_id == from_user.uuid]
+        requests = [
+            req for req in requests
+            if req.from_user_id == from_user.uuid
+        ]
         requests = sorted(requests, key=lambda req: req.timestamp)
         return requests
 
     def _get_all_requests(self) -> List[FriendRequest]:
         """Get all friend requests from the database"""
         requests_json = self._database.get_collection(self._collection_name)
-        return [self._serializer.from_json(req_json) for req_json in requests_json]
+        return [
+            self._serializer.from_json(req_json)
+            for req_json in requests_json
+        ]
 
 
 class PhotoRepository(BaseRepository[Photo]):
@@ -198,6 +217,7 @@ class PhotoRepository(BaseRepository[Photo]):
 
         :param database: database to persist photos in
         :param serializer: JSON serializer for photos
-        :param collection_name: collection name in the database, defaults to "photos"
+        :param collection_name: collection name in the database,
+            defaults to "photos"
         """
         super().__init__(database, serializer, collection_name)

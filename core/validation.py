@@ -11,13 +11,17 @@ def is_uuid(uuid: str) -> bool:
 
     :param uuid: string to check
     """
-    uuid_pattern = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
+    uuid_pattern = re.compile(
+        r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+    )
     return bool(re.fullmatch(uuid_pattern, uuid))
 
 
 def is_email(text: str) -> bool:
     """Return whether given text is a valid email address"""
-    email_pattern = re.compile(r"([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+")
+    email_pattern = re.compile(
+        r"([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+"
+    )
     return bool(re.fullmatch(email_pattern, text))
 
 
@@ -104,7 +108,10 @@ class UnsupportedFileFormatError(ModelError):
 
 class IncorrectHexRepresentationError(ModelError):
     def __init__(self):
-        super().__init__("Hex representation must be a string consisting of digits 0-9 and letters a-f")
+        super().__init__(
+            "Hex representation must be a string consisting of digits 0-9 "
+            "and letters a-f"
+        )
 
 
 class SelfReferenceError(ModelError):

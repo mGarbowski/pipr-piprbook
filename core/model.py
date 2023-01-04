@@ -1,4 +1,4 @@
-"""Model classes structuring data used by the application and persisted in a database"""
+"""Model classes structuring data used and persisted by the application"""
 
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -40,16 +40,22 @@ class User:
     def __post_init__(self):
         """Validate parameters
 
-        :raises IncorrectUuidError: if uuid, profile_picure_id or any of friend_uuids is not a valid uuid
-        :raises IncorrectUsernameError: if username is shorter than 4 characters
+        :raises IncorrectUuidError: if uuid, profile_picure_id or any of
+            friend_uuids is not a valid uuid
+        :raises IncorrectUsernameError: if username is shorter than 4
+            characters
         :raises IncorrectEmailError: if email is not a correct email address
-        :raises IncorrectPasswordHashError: if password_hash is not a valid sha256 hash
-        :raises IncorrectSaltError: if salt has wrong length or illegal characters
+        :raises IncorrectPasswordHashError: if password_hash is not a valid
+            sha256 hash
+        :raises IncorrectSaltError: if salt has wrong length or illegal
+            characters
         """
         if not is_uuid(self.uuid):
             raise IncorrectUuidError(self.uuid)
         if len(self.username) <= 3:
-            raise IncorrectUsernameError("Username must be at least 3 characters long")
+            raise IncorrectUsernameError(
+                "Username must be at least 3 characters long"
+            )
         if not is_email(self.email):
             raise IncorrectEmailError(self.email)
         if not is_hash(self.password_hash):
@@ -59,7 +65,8 @@ class User:
         for friend_id in self.friend_uuids:
             if not is_uuid(friend_id):
                 raise IncorrectUuidError(friend_id)
-        if (self.profile_picture_id is not None) and (not is_uuid(self.profile_picture_id)):
+        if self.profile_picture_id is not None \
+                and not is_uuid(self.profile_picture_id):
             raise IncorrectUuidError(self.profile_picture_id)
 
     def is_friends_with(self, user: 'User') -> bool:
@@ -83,7 +90,8 @@ class Message:
     def __post_init__(self):
         """Validate parameters
 
-        :raises IncorrectUuidError: if uuid, from_user_id or to_user_id is not a valid uuid
+        :raises IncorrectUuidError: if uuid, from_user_id or to_user_id is
+            not a valid uuid
         :raises IncorrectMessageTextError: if text is empty
         :raises SelfReferenceError: if from and to users are the same
         """
@@ -111,7 +119,8 @@ class FriendRequest:
     def __post_init__(self):
         """Validate parameters
 
-        :raises IncorrectUuidError: if uuid, from_user_id or to_user_id is not a valid uuid
+        :raises IncorrectUuidError: if uuid, from_user_id or to_user_id is
+            not a valid uuid
         :raises SelfReferenceError: if from and to users are the same
         """
         if not is_uuid(self.uuid):
@@ -141,7 +150,8 @@ class Photo:
         :raises IncorrectUuidError: if uuid is not a valid uuid
         :raises IncorrectFilenameError: if filename is incorrect
         :raises UnsupportedFileFormatError: if file format is not supported
-        :raises IncorrectHexRepresentationError: if binary_data_hex is not a string of hex digits
+        :raises IncorrectHexRepresentationError: if binary_data_hex is not a
+            string of hex digits
         """
         if not is_uuid(self.uuid):
             raise IncorrectUuidError(self.uuid)

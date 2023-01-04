@@ -32,8 +32,17 @@ class LoginWindow(QMainWindow):
         self.ui.setupUi(self)
         self.user_service = user_service
 
-        self.login_page = LoginPage(user_service, self._to_register_page, self._open_main_window, self)
-        self.register_page = RegisterPage(user_service, self._to_login_page, self)
+        self.login_page = LoginPage(
+            user_service,
+            self._to_register_page,
+            self._open_main_window,
+            self
+        )
+        self.register_page = RegisterPage(
+            user_service,
+            self._to_login_page,
+            self
+        )
 
         self.login_page_idx = self.ui.pages.addWidget(self.login_page)
         self.register_page_idx = self.ui.pages.addWidget(self.register_page)
@@ -87,18 +96,22 @@ class MainWindow(QMainWindow):
         self.__messenger_tab = MessengerPage(self.user_service, self)
         self.__invite_friends_tab = InviteFriendsPage(self.user_service, self)
 
-        self.__tab_index_by_name = {
+        self.__index_by_name = {
             "Profile": self.ui.tabs.addTab(self.__profile_tab, "Profile"),
-            "Messenger": self.ui.tabs.addTab(self.__messenger_tab, "Messenger"),
-            "Invite Friends": self.ui.tabs.addTab(self.__invite_friends_tab, "Invite Friends")
+            "Messenger": self.ui.tabs.addTab(
+                self.__messenger_tab, "Messenger"
+            ),
+            "Invite Friends": self.ui.tabs.addTab(
+                self.__invite_friends_tab, "Invite Friends"
+            )
         }
         self.__tab_by_index = {
-            self.__tab_index_by_name["Profile"]: self.__profile_tab,
-            self.__tab_index_by_name["Messenger"]: self.__messenger_tab,
-            self.__tab_index_by_name["Invite Friends"]: self.__invite_friends_tab,
+            self.__index_by_name["Profile"]: self.__profile_tab,
+            self.__index_by_name["Messenger"]: self.__messenger_tab,
+            self.__index_by_name["Invite Friends"]: self.__invite_friends_tab,
         }
 
-        self.ui.tabs.setCurrentIndex(self.__tab_index_by_name["Profile"])
+        self.ui.tabs.setCurrentIndex(self.__index_by_name["Profile"])
         self.ui.tabs.currentChanged.connect(self._refresh_tab)
 
     def _refresh_tab(self, tab_index: int):

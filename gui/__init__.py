@@ -1,1 +1,1 @@
-"""Package containg graphical user interface for the application using Pyside2"""
+"""Package containg graphical user interface implemented with Pyside2"""

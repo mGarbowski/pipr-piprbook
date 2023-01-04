@@ -4,10 +4,15 @@ from typing import TextIO
 
 from core.authentication import Authentication
 from core.model import User, Message, FriendRequest, Photo
-from core.serializers import MessageSerializer, UserSerializer, FriendRequestSerializer, PhotoSerializer
+from core.serializers import (
+    MessageSerializer, UserSerializer, FriendRequestSerializer, PhotoSerializer
+)
 from core.user_service import UserService
 from persistence.json_database import JsonDatabase
-from persistence.repositories import PhotoRepository, MessageRepository, UserRepository, FriendRequestRepository
+from persistence.repositories import (
+    PhotoRepository, MessageRepository,
+    UserRepository, FriendRequestRepository
+)
 
 
 def get_user_service_default(database_file: TextIO) -> UserService:
@@ -16,7 +21,8 @@ def get_user_service_default(database_file: TextIO) -> UserService:
     Creating all dependencies, sharing class instances.
     Expecting default collections - users, messages, friend_requests, photos
 
-    :param database_file: file storing the database used by UserService and its dependencies
+    :param database_file: file storing the database used
+        by UserService and its dependencies
     """
     collection_name_map = {
         User: "users",

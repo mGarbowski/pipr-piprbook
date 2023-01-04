@@ -11,7 +11,8 @@ class JsonDatabase:
 
     List of collections used by the database is passed to init.
     Handle to the JSON file is passed to init.
-    Attempts to access collection with other names than those from the list raise exceptions.
+    Attempts to access collection with other names than those from the list
+    raise exceptions.
 
     A collection is a list of entity dictionaries.
     An entity dictionary must have uuid key
@@ -22,29 +23,35 @@ class JsonDatabase:
 
         :param db_file: file to persist data in and to load data from
         :param collection_names: list of collection names used by the database
-        :raises InvalidDatabaseFileError: if file is not JSON or if file does not have all the required collections
+        :raises InvalidDatabaseFileError: if file is not JSON or if file
+        does not have all the required collections
         """
         JsonDatabase._verify_file(db_file, collection_names)
         self.__db_file = db_file
         self.__collection_names = collection_names
 
-    def get_by_id(self, entity_id: str, collection_name: str) -> Optional[Dict]:
+    def get_by_id(
+            self, entity_id: str, collection_name: str
+    ) -> Optional[Dict]:
         """Get an entity by its id or None if not found
 
         :param entity_id: id of entity
         :param collection_name: entity collection's name
-        :raises CollectionDoesNotExistError: when collection with given name does not exist
+        :raises CollectionDoesNotExistError: when collection with given name
+            does not exist
         """
         self._verify_collection_name(collection_name)
         collection = self._get_serialized_collection(collection_name)
         return collection[entity_id] if entity_id in collection else None
 
     def save(self, entity_dict: Dict, collection_name: str) -> None:
-        """Save an entity to the database, overwriting previous value if it existed
+        """Save an entity to the database, overwriting previous value if it
+        existed
 
         :param entity_dict: entity dictionary to be peristed in the database
         :param collection_name: entity collection's name
-        :raises CollectionDoesNotExistError: when collection with given name does not exist
+        :raises CollectionDoesNotExistError: when collection with given name
+            does not exist
         :raises NoUuidError: when entity_dict does not have a uuid
         """
         self._verify_collection_name(collection_name)
@@ -61,7 +68,8 @@ class JsonDatabase:
 
         :param entity_id: id of the entity to delete
         :param collection_name: entity collection's name
-        :raises CollectionDoesNotExistError: when collection with given name does not exist
+        :raises CollectionDoesNotExistError: when collection with given name
+            does not exist
         """
         self._verify_collection_name(collection_name)
         collection = self._get_serialized_collection(collection_name)
@@ -75,28 +83,40 @@ class JsonDatabase:
         """Get collection of entities by its name
 
         :param collection_name: name of the collection
-        :raises CollectionDoesNotExistError: when collection with given name does not exist
+        :raises CollectionDoesNotExistError: when collection with given name
+            does not exist
         """
         self._verify_collection_name(collection_name)
         collection = self._get_serialized_collection(collection_name)
         return list(collection.values())
 
-    def save_collection(self, collection: List[Dict], collection_name: str) -> None:
+    def save_collection(self, collection: List[Dict],
+                        collection_name: str) -> None:
         """Save collection to the database, overwriting all existing items
 
         :param collection: collection of entities to persist in the database
         :param collection_name: name of the collection
-        :raises CollectionDoesNotExistError: when collection with given name does not exist
-        :raises NoUuidError: when any entiy dict in the collection does not have a uuid
+        :raises CollectionDoesNotExistError: when collection with given name
+            does not exist
+        :raises NoUuidError: when any entiy dict in the collection does not
+            have a uuid
         """
         self._verify_collection_name(collection_name)
         for entity_dict in collection:
             self._verify_has_uuid(entity_dict)
 
-        serialized_collection = {entity_dict["uuid"]: entity_dict for entity_dict in collection}
-        self._save_serialized_collection(serialized_collection, collection_name)
+        serialized_collection = {
+            entity_dict["uuid"]: entity_dict
+            for entity_dict in collection
+        }
+        self._save_serialized_collection(
+            serialized_collection, collection_name
+        )
 
-    def _get_serialized_collection(self, collection_name: str) -> SerializedCollection:
+    def _get_serialized_collection(
+            self,
+            collection_name: str
+    ) -> SerializedCollection:
         """Get serialized collection by its name
 
         :param collection_name: name of the collection
@@ -127,10 +147,14 @@ class JsonDatabase:
         data = json.load(self.__db_file)
         return data
 
-    def _save_all_collections(self, collections: Dict[str, SerializedCollection]) -> None:
+    def _save_all_collections(
+            self,
+            collections: Dict[str, SerializedCollection]
+    ) -> None:
         """Save all serialized collection to the database file
 
-        :param collections: dictionary mapping collection names to serialized collections
+        :param collections: dictionary mapping collection names to
+        serialized collections
         """
         self.__db_file.seek(0)  # Go to the first byte before reading
         self.__db_file.truncate(0)  # Delete file content
@@ -140,7 +164,8 @@ class JsonDatabase:
         """Verify if collection with given name exists
 
         :param collection_name: name of a collection to verify
-        :raises CollectionDoesNotExistError: if collection with given name does not exist
+        :raises CollectionDoesNotExistError: if collection with given name
+            does not exist
         """
         if collection_name not in self.__collection_names:
             raise CollectionDoesNotExistError(collection_name)
@@ -172,16 +197,19 @@ class JsonDatabase:
             if file is not a valid JSON
         """
         if not db_file.readable() or not db_file.writable():
-            raise InvalidDatabaseFileError("File must be readable and writable")
+            raise InvalidDatabaseFileError(
+                "File must be readable and writable")
 
         try:
             file_data = json.load(db_file)
             file_keys = set(file_data.keys())
             collection_names_set = set(collection_names)
             if not collection_names_set.issubset(file_keys):
-                raise InvalidDatabaseFileError("JSON must contain all specified collections")
+                raise InvalidDatabaseFileError(
+                    "JSON must contain all specified collections")
         except Exception as e:
-            raise InvalidDatabaseFileError("File must be in JSON format") from e
+            raise InvalidDatabaseFileError(
+                "File must be in JSON format") from e
 
 
 class JsonDatabaseException(Exception):
@@ -190,7 +218,8 @@ class JsonDatabaseException(Exception):
 
 
 class InvalidDatabaseFileError(JsonDatabaseException):
-    """Error Signaling that a JSON file is not a valid representation of a database"""
+    """Error Signaling that a JSON file is not a valid representation of a
+    database"""
     pass
 
 

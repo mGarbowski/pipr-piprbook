@@ -57,7 +57,8 @@ class Authentication:
     def logged_in_user(self) -> Optional[User]:
         """Return a deep copy of currently logged-in user
 
-        Copying to prevent from mutating the user externally - avoid security vulnerability
+        Copying to prevent from mutating the user externally - avoid
+            security vulnerability
         """
         return deepcopy(self.__logged_in_user)
 
@@ -101,5 +102,5 @@ class IncorrectPasswordError(LoginFailedError):
 
 
 class UnauthorizedError(Exception):
-    """Exception signaling that user is unauthorized to perform certain operation"""
+    """Exception signaling that user is unauthorized to perform action"""
     pass
