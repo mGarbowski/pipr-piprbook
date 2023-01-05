@@ -8,5 +8,5 @@ do
   filename=$(basename $file)
   new_filename="ui_$(echo $filename | sed s/".ui"/".py"/)"
   new_file_path="$components_dir/$new_filename"
-  ./venv-3.8/bin/pyside2-uic $file > $new_file_path
+  pyside2-uic $file > $new_file_path
 done
