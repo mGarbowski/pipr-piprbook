@@ -39,6 +39,7 @@ class ProfilePage(QWidget):
         self.ui.profile_header.setText(f"{user.username}'s profile")
         self.ui.username_display.setText(f"Username: {user.username}")
         self.ui.email_display.setText(f"Email address: {user.email}")
+        self.ui.bio_input.setText(user.bio if user.bio else "")
         self.ui.bio_display.setText(
             f"Bio: {user.bio}" if user.bio else "No bio set"
         )
@@ -78,7 +79,7 @@ class ProfilePage(QWidget):
         bio = self.ui.bio_input.toPlainText()
         self.user_service.set_bio(user, bio)
         self.ui.bio_display.setText(f"Bio: {user.bio}")
-        self.ui.bio_input.setText("")
+        self.ui.bio_input.setText(user.bio)
 
     def _display_profile_picture(self):
         """Display user's profile picture or a placeholder if not set."""
