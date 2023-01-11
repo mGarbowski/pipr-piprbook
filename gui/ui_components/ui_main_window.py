@@ -54,6 +54,6 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"PIPRbook", None))
         self.action_log_out.setText(QCoreApplication.translate("MainWindow", u"Log out", None))
-        self.menuOptions.setTitle(QCoreApplication.translate("MainWindow", u"Options", None))
+        self.menuOptions.setTitle(QCoreApplication.translate("MainWindow", u"Account", None))
     # retranslateUi
 

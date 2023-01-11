@@ -148,5 +148,3 @@ def main(args):
 
 if __name__ == '__main__':
     main(sys.argv)
-
-# TODO: more visible log out option

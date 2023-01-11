@@ -35,7 +35,7 @@
    </property>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
-     <string>Options</string>
+     <string>Account</string>
     </property>
     <addaction name="action_log_out"/>
    </widget>
