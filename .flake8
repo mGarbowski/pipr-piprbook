@@ -1,0 +1,15 @@
+[flake8]
+ignore = D107
+docstring-convention = pep257
+exclude =
+    .git
+    venv
+    venv-3.8
+    .idea
+    .vscode
+    .mypy_cache
+    .pytest_cache
+    dev
+    gui/ui_component_templates,
+    gui/ui_components
+    tests
