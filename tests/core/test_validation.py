@@ -1,4 +1,4 @@
-from core.validation import is_uuid, is_email, is_filename, is_hex, is_salt, is_hash
+from core.validation import is_uuid, is_email, is_filename, is_hex, is_salt, is_hash, is_weak_password
 
 
 class TestIsUuid:
@@ -27,6 +27,21 @@ class TestIsEmail:
         assert not is_email("user@192.168.1.1")
         assert not is_email("user@gmail")
         assert not is_email("-user@example.com")
+
+
+class TestIsPasswordWeak:
+
+    def test_is_weak(self):
+        assert is_weak_password("user")
+        assert is_weak_password("user123456.")
+        assert is_weak_password("UseRuSeRu")
+        assert is_weak_password("useruser./1^")
+        assert is_weak_password("USERUSERUSER./1^")
+        assert is_weak_password("USERUSE123./1^")
+
+    def test_id_not_weak(self):
+        assert not is_weak_password("useR%$1234")
+        assert not is_weak_password("Pa$$word8123")
 
 
 class TestIsFilename:

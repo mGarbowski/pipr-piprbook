@@ -1,7 +1,7 @@
 """Utilities for parameter validation and appropriate exceptions."""
 
 import re
-from string import ascii_letters
+from string import ascii_letters, ascii_lowercase, ascii_uppercase, punctuation, digits
 
 SALT_LENGTH = 10
 
@@ -23,6 +23,30 @@ def is_email(text: str) -> bool:
         r"([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+"
     )
     return bool(re.fullmatch(email_pattern, text))
+
+
+def is_weak_password(password: str) -> bool:
+    """Return whether password is weak.
+
+    Strong password should:
+        - be at least 8 characters long
+        - contain upper and lowercase letters
+        - contain a digit
+        - containg a special character
+    """
+
+    if len(password) < 8:
+        return True
+    if not any(lower in password for lower in ascii_lowercase):
+        return True
+    if not any(upper in password for upper in ascii_uppercase):
+        return True
+    if not any(special in password for special in punctuation):
+        return True
+    if not any(digit in password for digit in digits):
+        return True
+
+    return False
 
 
 def is_filename(text: str) -> bool:
