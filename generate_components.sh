@@ -3,7 +3,7 @@
 templates_dir="./gui/ui_component_templates"
 components_dir="./gui/ui_components"
 
-for file in "$templates_dir"/*
+for file in "$templates_dir"/*.ui
 do
   filename=$(basename $file)
   new_filename="ui_$(echo $filename | sed s/".ui"/".py"/)"
