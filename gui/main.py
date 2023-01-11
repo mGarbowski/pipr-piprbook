@@ -146,3 +146,10 @@ def main(args):
 
 if __name__ == '__main__':
     main(sys.argv)
+
+# TODO: clear wrong username or password message correctly
+# TODO: upload profile picture does not fit button
+# TODO: more visible log out option
+# TODO: update bio, actually update, not set
+# TODO: flake8-docstrings
+# TODO: docstring typos
