@@ -39,6 +39,7 @@ class LoginPage(QWidget):
         self._setup()
 
     def clear_form(self) -> None:
+        """Clear for inouts and error message."""
         self.ui.username_input.setText("")
         self.ui.password_input.setText("")
         self.ui.login_failed_text.setText("")
