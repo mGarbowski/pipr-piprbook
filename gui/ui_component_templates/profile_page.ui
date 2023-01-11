@@ -126,7 +126,7 @@
           </rect>
          </property>
          <property name="text">
-          <string>Upload profile picture</string>
+          <string>Upload</string>
          </property>
         </widget>
         <widget class="QLabel" name="profile_picture">

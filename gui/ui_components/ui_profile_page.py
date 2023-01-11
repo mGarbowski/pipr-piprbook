@@ -133,7 +133,7 @@ class Ui_ProfilePage(object):
         self.email_display.setText(QCoreApplication.translate("ProfilePage", u"Email display", None))
         self.bio_display.setText(QCoreApplication.translate("ProfilePage", u"Bio display", None))
         self.update_bio_button.setText(QCoreApplication.translate("ProfilePage", u"Update bio", None))
-        self.upload_profile_picture_button.setText(QCoreApplication.translate("ProfilePage", u"Upload profile picture", None))
+        self.upload_profile_picture_button.setText(QCoreApplication.translate("ProfilePage", u"Upload", None))
         self.profile_picture.setText("")
     # retranslateUi
 

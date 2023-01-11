@@ -149,5 +149,4 @@ def main(args):
 if __name__ == '__main__':
     main(sys.argv)
 
-# TODO: upload profile picture does not fit button
 # TODO: more visible log out option
