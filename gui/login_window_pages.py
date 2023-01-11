@@ -38,23 +38,27 @@ class LoginPage(QWidget):
         self.ui.setupUi(self)
         self._setup()
 
+    def clear_form(self) -> None:
+        self.ui.username_input.setText("")
+        self.ui.password_input.setText("")
+        self.ui.login_failed_text.setText("")
+
     def _setup(self):
         """Connect event handlers and display."""
         self.ui.log_in_button.clicked.connect(self._log_in_user)
         self.ui.register_button.clicked.connect(self.to_register_page)
-        self.ui.login_failed_text.setText("")
+        self.clear_form()
 
     def _log_in_user(self):
         """Attempt to log in, display message on failure."""
         username = self.ui.username_input.text()
         password = self.ui.password_input.text()
         success = self.user_service.log_in_user(username, password)
+        self.clear_form()
         if success:
             self.open_main_window()
         else:
             self.ui.login_failed_text.setText("Wrong username or password")
-            self.ui.username_input.setText("")
-            self.ui.password_input.setText("")
 
 
 class RegisterPage(QWidget):
@@ -84,9 +88,9 @@ class RegisterPage(QWidget):
         """Connect event handlers and display."""
         self.ui.register_button.clicked.connect(self._register_user)
         self.ui.back_button.clicked.connect(self.to_login_page)
-        self._clear_form()
+        self.clear_form()
 
-    def _clear_form(self):
+    def clear_form(self):
         """Clear registration form."""
         self.ui.registration_failed_text.setText("")
         self.ui.username_input.setText("")
@@ -104,7 +108,7 @@ class RegisterPage(QWidget):
         email = self.ui.email_input.text()
         password = self.ui.password_input.text()
         repeated_password = self.ui.confirm_password_input.text()
-        self._clear_form()
+        self.clear_form()
 
         if password != repeated_password:
             self.ui.registration_failed_text.setText("Passwords do not match")

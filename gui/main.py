@@ -50,10 +50,12 @@ class LoginWindow(QMainWindow):
 
     def _to_register_page(self):
         """Switch to login page, callback passed to child widgets."""
+        self.register_page.clear_form()
         self.ui.pages.setCurrentIndex(self.register_page_idx)
 
     def _to_login_page(self):
         """Switch to register page, callback passed to child widgets."""
+        self.login_page.clear_form()
         self.ui.pages.setCurrentIndex(self.login_page_idx)
 
     def _open_main_window(self):
@@ -147,7 +149,6 @@ def main(args):
 if __name__ == '__main__':
     main(sys.argv)
 
-# TODO: clear wrong username or password message correctly
 # TODO: upload profile picture does not fit button
 # TODO: more visible log out option
 # TODO: update bio, actually update, not set
