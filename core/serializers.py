@@ -1,4 +1,4 @@
-"""Json serialization of model classes"""
+"""Json serialization of model classes."""
 
 from datetime import datetime
 from typing import Dict
@@ -7,11 +7,11 @@ from core.model import User, Message, FriendRequest, Photo
 
 
 class UserSerializer:
-    """Class for JSON serialization and deserializaiton of User objects"""
+    """Class for JSON serialization and deserializaiton of User objects."""
 
     @staticmethod
     def to_json(entity: User) -> Dict:
-        """Convert user object to JSON representation
+        """Convert user object to JSON representation.
 
         :param entity: user to serialize
         """
@@ -28,7 +28,7 @@ class UserSerializer:
 
     @staticmethod
     def from_json(json_dict: Dict) -> User:
-        """Create user object from its JSON representation
+        """Create user object from its JSON representation.
 
         :param json_dict: dictionary representation of a user
         :raises RepresentationError: if json_dict is not a
@@ -50,11 +50,11 @@ class UserSerializer:
 
 
 class MessageSerializer:
-    """Class for JSON serialization and deserializaiton of Message objects"""
+    """Class for JSON serialization and deserializaiton of Message objects."""
 
     @staticmethod
     def to_json(entity: Message) -> Dict:
-        """Convert a message object to JSON representation
+        """Convert a message object to JSON representation.
 
         Timestamps are stored as ISO-format strings
 
@@ -70,7 +70,7 @@ class MessageSerializer:
 
     @staticmethod
     def from_json(json_dict: Dict) -> Message:
-        """Create a message object from its JSON representation
+        """Create a message object from its JSON representation.
 
         :param json_dict: dictionary representation of a message
         :raises RepresentationError: if json_dict is not a
@@ -89,11 +89,11 @@ class MessageSerializer:
 
 
 class FriendRequestSerializer:
-    """Class for JSON serialization of FriendRequest objects"""
+    """Class for JSON serialization of FriendRequest objects."""
 
     @staticmethod
     def to_json(entity: FriendRequest) -> Dict:
-        """Convert a friend request object to a JSON representation
+        """Convert a friend request object to a JSON representation.
 
         Timestamps are stored as ISO-format strings
 
@@ -108,7 +108,7 @@ class FriendRequestSerializer:
 
     @staticmethod
     def from_json(json_dict: Dict) -> FriendRequest:
-        """Create a friend request object from its JSON representation
+        """Create a friend request object from its JSON representation.
 
         :param json_dict: dictionary representation of a friend request
         :raises RepresentationError: if json_dict is not a
@@ -126,11 +126,11 @@ class FriendRequestSerializer:
 
 
 class PhotoSerializer:
-    """Class for JSON serialization and deserializaiton of Photo objects"""
+    """Class for JSON serialization and deserializaiton of Photo objects."""
 
     @staticmethod
     def to_json(entity: Photo) -> Dict:
-        """Convert a Photo object to a JSON representation
+        """Convert a Photo object to a JSON representation.
 
         :param entity: photo to serializer
         """
@@ -143,7 +143,7 @@ class PhotoSerializer:
 
     @staticmethod
     def from_json(json_dict: Dict) -> Photo:
-        """Create a Photo object from its JSON representation
+        """Create a Photo object from its JSON representation.
 
         :param json_dict: dictionary representation of a photo
         :raises RepresentationError: if json_dict is not a
@@ -161,7 +161,7 @@ class PhotoSerializer:
 
 
 class RepresentationError(Exception):
-    """Exception signaling invalid representation of an entity"""
+    """Exception signaling invalid representation of an entity."""
 
     def __init__(self, json):
         super().__init__("Received invalid representation of an entity")

@@ -1,4 +1,4 @@
-"""Pages for the main window"""
+"""Pages for the main window."""
 
 from PySide2.QtCore import QByteArray
 from PySide2.QtGui import QPixmap
@@ -13,10 +13,10 @@ from gui.ui_components.ui_profile_page import Ui_ProfilePage
 
 
 class ProfilePage(QWidget):
-    """Page showing user's profile"""
+    """Page showing user's profile."""
 
     def __init__(self, user_service: UserService, parent=None):
-        """Create profile page
+        """Create profile page.
 
         :param user_service: user service providing access to user data
         :param parent: parent widget
@@ -29,11 +29,11 @@ class ProfilePage(QWidget):
         self._setup_profile_page()
 
     def refresh(self):
-        """Refresh page"""
+        """Refresh page."""
         self._setup_profile_page()
 
     def _setup_profile_page(self):
-        """Setup event handlers and display user info"""
+        """Connect event handlers and display user info."""
         user = self.user_service.get_current_user()
 
         self.ui.profile_header.setText(f"{user.username}'s profile")
@@ -51,7 +51,7 @@ class ProfilePage(QWidget):
         )
 
     def _upload_profile_picture(self):
-        """Select photo and set as user's new profile picture"""
+        """Select photo and set as user's new profile picture."""
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.AnyFile)
         file_path, _ = file_dialog.getOpenFileName()
@@ -73,7 +73,7 @@ class ProfilePage(QWidget):
         self._display_profile_picture()
 
     def _update_user_bio(self):
-        """Update user's bio"""
+        """Update user's bio."""
         user = self.user_service.get_current_user()
         bio = self.ui.bio_input.toPlainText()
         self.user_service.set_bio(user, bio)
@@ -81,7 +81,7 @@ class ProfilePage(QWidget):
         self.ui.bio_input.setText("")
 
     def _display_profile_picture(self):
-        """Display user's profile picture or a placeholder if not set"""
+        """Display user's profile picture or a placeholder if not set."""
         user = self.user_service.get_current_user()
         profile_picture = self.user_service.get_profile_picture(user)
         if profile_picture:
@@ -95,10 +95,10 @@ class ProfilePage(QWidget):
 
 
 class MessengerPage(QWidget):
-    """Page for sending messages to friends"""
+    """Page for sending messages to friends."""
 
     def __init__(self, user_service: UserService, parent=None):
-        """Create messenger page
+        """Create messenger page.
 
         :param user_service: user service handling sending
             and retreiving messages
@@ -114,11 +114,11 @@ class MessengerPage(QWidget):
         self.ui.send_button.clicked.connect(self._send_message)
 
     def refresh(self):
-        """Refresh page"""
+        """Refresh page."""
         self._setup_friends_list()
 
     def _setup_friends_list(self):
-        """Display list of user's friends"""
+        """Display list of user's friends."""
         self.ui.friends_list.clear()
 
         user = self.user_service.get_current_user()
@@ -134,7 +134,7 @@ class MessengerPage(QWidget):
         self._display_firend_info()
 
     def _display_firend_info(self):
-        """Display info about selected friend"""
+        """Display info about selected friend."""
         if self.__friend is None:
             self.ui.user_info.setText("Select friend to chat with")
             self.ui.friend_bio.clear()
@@ -156,7 +156,7 @@ class MessengerPage(QWidget):
             self.ui.friend_profile_picture.setPixmap(pixmap)
 
     def _display_messages(self):
-        """Display messages exchanged with selected friend"""
+        """Display messages exchanged with selected friend."""
         self.ui.messages.clear()
         if self.__friend is None:
             return
@@ -176,13 +176,13 @@ class MessengerPage(QWidget):
         self.ui.messages.setText(messages_text)
 
     def _select_friend(self, item: QListWidgetItem):
-        """Select friend to exchange messages with"""
+        """Select friend to exchange messages with."""
         self.__friend = item.user
         self._display_messages()
         self._display_firend_info()
 
     def _send_message(self):
-        """Send message to the selected friend"""
+        """Send message to the selected friend."""
         text = self.ui.message_input.text()
         self.ui.message_input.clear()
 
@@ -198,10 +198,10 @@ class MessengerPage(QWidget):
 
 
 class InviteFriendsPage(QWidget):
-    """Page for managing friend invitations"""
+    """Page for managing friend invitations."""
 
     def __init__(self, user_service: UserService, parent=None):
-        """Create page for inviting friends
+        """Create page for inviting friends.
 
         :param user_service: service handling invitation and user search logic
         :param parent: parent widget
@@ -221,14 +221,14 @@ class InviteFriendsPage(QWidget):
         self._display_awaiting_invitations()
 
     def refresh(self):
-        """Refresh page
+        """Refresh page.
 
         Required by MainWindow's interface
         """
         pass
 
     def _setup_event_handles(self):
-        """Setup event handlers for buttons and lists"""
+        """Connect event handlers for buttons and lists."""
         self.ui.search_button.clicked.connect(self._search_users)
         self.ui.invite_button.clicked.connect(self._invite_selected_user)
         self.ui.accept_button.clicked.connect(self._accept_awaiting_invitaiton)
@@ -244,11 +244,11 @@ class InviteFriendsPage(QWidget):
         )
 
     def _select_user(self, item: QListWidgetItem):
-        """Select user from search result"""
+        """Select user from search result."""
         self.__selected_user = item.user
 
     def _search_users(self):
-        """Search and display users"""
+        """Search and display users."""
         self.ui.search_result.clear()
 
         current_user = self.user_service.get_current_user()
@@ -282,7 +282,7 @@ class InviteFriendsPage(QWidget):
             self.ui.search_result.addItem(item)
 
     def _invite_selected_user(self):
-        """Send a friend request to the selected user from search result"""
+        """Send a friend request to the selected user from search result."""
         if self.__selected_user is None:
             return
 
@@ -294,11 +294,11 @@ class InviteFriendsPage(QWidget):
         self._display_sent_invitations()
 
     def _select_awaiting_invitation(self, item: QListWidgetItem):
-        """Select invitation from list of received invitations"""
+        """Select invitation from list of received invitations."""
         self.__awaiting_invitation = item.invitation
 
     def _display_awaiting_invitations(self):
-        """Display received invitations"""
+        """Display received invitations."""
         self.ui.awaiting_invitations.clear()
 
         current_user = self.user_service.get_current_user()
@@ -314,7 +314,7 @@ class InviteFriendsPage(QWidget):
             self.ui.awaiting_invitations.addItem(item)
 
     def _accept_awaiting_invitaiton(self):
-        """Accept selected received invitation"""
+        """Accept selected received invitation."""
         if self.__awaiting_invitation is None:
             return
 
@@ -323,7 +323,7 @@ class InviteFriendsPage(QWidget):
         self._search_users()
 
     def _ignore_awaiting_invitation(self):
-        """Delete selected received invitation"""
+        """Delete selected received invitation."""
         if self.__awaiting_invitation is None:
             return
 
@@ -332,11 +332,11 @@ class InviteFriendsPage(QWidget):
         self._display_awaiting_invitations()
 
     def _select_sent_invitation(self, list_item: QListWidgetItem):
-        """Select sent invitation"""
+        """Select sent invitation."""
         self.__sent_invitation = list_item.invitation
 
     def _display_sent_invitations(self):
-        """Display invitations sent by the logged-in user"""
+        """Display invitations sent by the logged-in user."""
         self.ui.sent_invitations.clear()
         current_user = self.user_service.get_current_user()
         sent_invitations = self.user_service.get_friend_requests_from(
@@ -349,7 +349,7 @@ class InviteFriendsPage(QWidget):
             self.ui.sent_invitations.addItem(list_item)
 
     def _cancel_sent_invitation(self):
-        """Delete selected sent invitation"""
+        """Delete selected sent invitation."""
         if self.__sent_invitation is None:
             return
 

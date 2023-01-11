@@ -1,4 +1,4 @@
-"""GUI for the application
+"""GUI for the application.
 
 Provide path to a database file as a positionala argument
 """
@@ -16,13 +16,13 @@ from gui.ui_components.ui_main_window import Ui_MainWindow
 
 
 class LoginWindow(QMainWindow):
-    """Window for user login and registration
+    """Window for user login and registration.
 
     Opens at application start
     """
 
     def __init__(self, user_service: UserService, parent=None):
-        """Create login window
+        """Create login window.
 
         :param user_service: service handling login and registration logic
         :param parent: parent widget
@@ -49,29 +49,29 @@ class LoginWindow(QMainWindow):
         self.ui.pages.setCurrentIndex(self.login_page_idx)
 
     def _to_register_page(self):
-        """Switch to login page, callback passed to child widgets"""
+        """Switch to login page, callback passed to child widgets."""
         self.ui.pages.setCurrentIndex(self.register_page_idx)
 
     def _to_login_page(self):
-        """Switch to register page, callback passed to child widgets"""
+        """Switch to register page, callback passed to child widgets."""
         self.ui.pages.setCurrentIndex(self.login_page_idx)
 
     def _open_main_window(self):
-        """Open main window and close this one"""
+        """Open main window and close this one."""
         self.main_window = MainWindow(self.user_service)
         self.main_window.show()
         self.hide()
 
 
 class MainWindow(QMainWindow):
-    """Main window of the application
+    """Main window of the application.
 
     Allows viewing logged-in user's profile, sending messages to friends
     and inviting new friends or accepting invitations
     """
 
     def __init__(self, user_service: UserService, parent=None):
-        """Create main window
+        """Create main window.
 
         User service must have a user already logged in
 
@@ -89,7 +89,7 @@ class MainWindow(QMainWindow):
         self._setup_main_window()
 
     def _setup_main_window(self):
-        """Setup event handlers, tabs and tab refreshing"""
+        """Connect event handlers, tabs and tab refreshing."""
         self.ui.action_log_out.triggered.connect(self._log_out)
 
         self.__profile_tab = ProfilePage(self.user_service, self)
@@ -115,11 +115,11 @@ class MainWindow(QMainWindow):
         self.ui.tabs.currentChanged.connect(self._refresh_tab)
 
     def _refresh_tab(self, tab_index: int):
-        """Refresh tab with given index"""
+        """Refresh tab with given index."""
         self.__tab_by_index[tab_index].refresh()
 
     def _log_out(self):
-        """Log out user, open login window and close this one"""
+        """Log out user, open login window and close this one."""
         self.user_service.log_out_user()
         self.login_window = LoginWindow(self.user_service)
         self.login_window.show()
@@ -127,7 +127,7 @@ class MainWindow(QMainWindow):
 
 
 def main(args):
-    """Entrypoint to the application
+    """Entrypoint to the application.
 
     Expects path to a database file as first positional argument
     Opens Login window
@@ -151,5 +151,3 @@ if __name__ == '__main__':
 # TODO: upload profile picture does not fit button
 # TODO: more visible log out option
 # TODO: update bio, actually update, not set
-# TODO: flake8-docstrings
-# TODO: docstring typos

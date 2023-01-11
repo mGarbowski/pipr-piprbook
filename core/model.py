@@ -1,4 +1,4 @@
-"""Model classes structuring data used and persisted by the application"""
+"""Model classes structuring data used and persisted by the application."""
 
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -21,12 +21,14 @@ from core.validation import (
 
 
 class Entity(Protocol):
+    """Entity persisted in a database."""
+
     uuid: str
 
 
 @dataclass
 class User:
-    """Class for storing data about a user"""
+    """Class for storing data about a user."""
 
     uuid: str
     username: str
@@ -38,7 +40,7 @@ class User:
     bio: Optional[str] = None
 
     def __post_init__(self):
-        """Validate parameters
+        """Validate parameters.
 
         :raises IncorrectUuidError: if uuid, profile_picure_id or any of
             friend_uuids is not a valid uuid
@@ -70,7 +72,7 @@ class User:
             raise IncorrectUuidError(self.profile_picture_id)
 
     def is_friends_with(self, user: 'User') -> bool:
-        """Return whether self is friends with user
+        """Return whether self is friends with user.
 
         :param user: user to check
         """
@@ -79,7 +81,7 @@ class User:
 
 @dataclass
 class Message:
-    """Class for storing data about a message"""
+    """Class for storing data about a message."""
 
     uuid: str
     text: str
@@ -88,7 +90,7 @@ class Message:
     to_user_id: str
 
     def __post_init__(self):
-        """Validate parameters
+        """Validate parameters.
 
         :raises IncorrectUuidError: if uuid, from_user_id or to_user_id is
             not a valid uuid
@@ -109,7 +111,7 @@ class Message:
 
 @dataclass
 class FriendRequest:
-    """Class for storing data about a friend request"""
+    """Class for storing data about a friend request."""
 
     uuid: str
     timestamp: datetime
@@ -117,7 +119,7 @@ class FriendRequest:
     to_user_id: str
 
     def __post_init__(self):
-        """Validate parameters
+        """Validate parameters.
 
         :raises IncorrectUuidError: if uuid, from_user_id or to_user_id is
             not a valid uuid
@@ -135,17 +137,18 @@ class FriendRequest:
 
 @dataclass
 class Photo:
-    """Class representing a photo
+    """Class representing a photo.
 
     Content of the binary file is stored as a string of hexadecimal digits
     """
+
     uuid: str
     filename: str
     format: str
     binary_data_hex: str
 
     def __post_init__(self):
-        """Validate parameters
+        """Validate parameters.
 
         :raises IncorrectUuidError: if uuid is not a valid uuid
         :raises IncorrectFilenameError: if filename is incorrect
@@ -165,16 +168,16 @@ class Photo:
 
     @property
     def supported_file_formats(self) -> Tuple[str, ...]:
-        """Return tuple of suppoerted file formats"""
+        """Return tuple of suppoerted file formats."""
         return "jpg", "png"
 
     def get_bytes(self) -> bytes:
-        """Return binary data of the photo"""
+        """Return binary data of the photo."""
         return bytes.fromhex(self.binary_data_hex)
 
     @classmethod
     def from_file(cls, file_handle: BinaryIO, file_path: str) -> 'Photo':
-        """Create a Photo object from a binary file
+        """Create a Photo object from a binary file.
 
         :param file_handle: binary file
         :param file_path: path to the file

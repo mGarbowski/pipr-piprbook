@@ -63,9 +63,9 @@ Sprawdzenie typów
 mypy core persistence gui
 ```
 
-Sprawdzenie formatowania
+Sprawdzenie formatowania kodu i docstringów
 ```bash
-flake8 core gui persistence --exclude gui/ui_component_templates,gui/ui_components
+flake8
 ```
 
 Sprawdzenie pokrycia

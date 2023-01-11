@@ -1,4 +1,4 @@
-"""The main interface for all operations related with users"""
+"""The main interface for all operations related with users."""
 
 from datetime import datetime
 from typing import Optional, List
@@ -13,7 +13,7 @@ from persistence.repositories import (
 
 
 class UserService:
-    """Class for performing operations on users
+    """Class for performing operations on users.
 
     Some operations require authorization,
         authentication and authorization logic is delegated
@@ -30,7 +30,7 @@ class UserService:
             friend_request_repository: FriendRequestRepository,
             photo_repository: PhotoRepository
     ) -> None:
-        """Create user service instance with given dependencies"""
+        """Create user service instance with given dependencies."""
         self.__authentication = authentication
         self.__user_repository = user_repository
         self.__message_repository = message_repository
@@ -38,7 +38,7 @@ class UserService:
         self.__photo_repository = photo_repository
 
     def log_in_user(self, username: str, password: str) -> bool:
-        """Attempt to log in, return True if successful
+        """Attempt to log in, return True if successful.
 
         :param username: user's username
         :param password: user's password in plain text
@@ -50,17 +50,17 @@ class UserService:
             return False
 
     def log_out_user(self):
-        """Log out currently logged-in user if there is any"""
+        """Log out currently logged-in user if there is any."""
         self.__authentication.log_out()
 
     def get_user_by_id(self, user_id: str) -> Optional[User]:
-        """Get user by id or None if not found"""
+        """Get user by id or None if not found."""
         return self.__user_repository.get_by_id(user_id)
 
     def get_users_by_username_fragment(
             self, username_fragment: str
     ) -> List[User]:
-        """Get all users with usernames matching given fragment
+        """Get all users with usernames matching given fragment.
 
         :param username_fragment: exact text contained in users' usernames
         """
@@ -71,7 +71,7 @@ class UserService:
     def register_new_user(
             self, username: str, email: str, password: str
     ) -> None:
-        """Attempt to create new user with given credentials
+        """Attempt to create new user with given credentials.
 
         Raises appropriate exceptions on invalid credentials
 
@@ -104,7 +104,7 @@ class UserService:
         self.save_user(user)
 
     def get_current_user(self) -> Optional[User]:
-        """Get currently logged-in user or None if nobody is logged-in
+        """Get currently logged-in user or None if nobody is logged-in.
 
         Refreshes user data from the database to avoid
             comparisons with stale information
@@ -113,15 +113,15 @@ class UserService:
         return self._refresh_user_data(current_user) if current_user else None
 
     def _refresh_user_data(self, user: User) -> Optional[User]:
-        """Return the same user from the database, with his current state"""
+        """Return the same user from the database, with his current state."""
         return self.get_user_by_id(user.uuid)
 
     def save_user(self, user: User) -> None:
-        """Save user in the database"""
+        """Save user in the database."""
         self.__user_repository.save(user)
 
     def set_bio(self, user: User, bio: str) -> None:
-        """Set user's bio, requires user to be logged-in
+        """Set user's bio, requires user to be logged-in.
 
         :raises UnauthorizedError: if user is not logged-in
         """
@@ -131,14 +131,14 @@ class UserService:
         self.save_user(user)
 
     def get_profile_picture(self, user: User) -> Optional[Photo]:
-        """Get user's profile picture or None if not set"""
+        """Get user's profile picture or None if not set."""
         if user.profile_picture_id is None:
             return None
 
         return self.__photo_repository.get_by_id(user.profile_picture_id)
 
     def add_profile_picture(self, user: User, photo: Photo) -> None:
-        """Add user's profile picture overwriting existing if there was any
+        """Add user's profile picture overwriting existing if there was any.
 
         Requires user to be logged-in
         Previous profile picture is deleted
@@ -158,11 +158,11 @@ class UserService:
         self.__photo_repository.save(photo)
 
     def delete_picture(self, photo: Photo) -> None:
-        """Delte photo from the database"""
+        """Delte photo from the database."""
         self.__photo_repository.delete(photo)
 
     def get_friends(self, user: User) -> List[User]:
-        """Return list of user's friends
+        """Return list of user's friends.
 
         List can be in any order
         """
@@ -172,7 +172,7 @@ class UserService:
         ]
 
     def send_message(self, from_user: User, to_user: User, text: str) -> None:
-        """Send text message from one user to another
+        """Send text message from one user to another.
 
         Requires sending user to be logged-in
         Users do not have to be friends
@@ -197,7 +197,7 @@ class UserService:
         )
 
     def get_friend_requests_from(self, user: User) -> List[FriendRequest]:
-        """Get a list of all awaiting friend requests sent by the user
+        """Get a list of all awaiting friend requests sent by the user.
 
         Requires user to be logged-in
 
@@ -207,7 +207,7 @@ class UserService:
         return self.__friend_request_repository.get_requests_from_user(user)
 
     def get_friend_requests_to(self, user: User) -> List[FriendRequest]:
-        """Get a list of all awaiting friend requests sent to the user
+        """Get a list of all awaiting friend requests sent to the user.
 
         Requires user to be logged-in
 
@@ -219,7 +219,7 @@ class UserService:
     def send_friend_request(
             self, from_user: User, to_user: User
     ) -> FriendRequest:
-        """Send a friend request from one user to another
+        """Send a friend request from one user to another.
 
         Requires sending user to be logged-in
         Users cannot already be friends
@@ -241,7 +241,7 @@ class UserService:
         )
 
     def accept_friend_request(self, friend_request: FriendRequest) -> None:
-        """Accept a friend request, users will be friends after accepting
+        """Accept a friend request, users will be friends after accepting.
 
         Accepting user must be logged-in
 
@@ -270,14 +270,14 @@ class UserService:
         self.__friend_request_repository.delete(friend_request)
 
     def delete_friend_request(self, friend_request: FriendRequest) -> None:
-        """Delete friend request
+        """Delete friend request.
 
         Does not require users to be logged-in as they may not exist
         """
         self.__friend_request_repository.delete(friend_request)
 
     def get_messages(self, user_a: User, user_b: User) -> List[Message]:
-        """Get all messages exchanged between two users in chronological order
+        """Get all messages exchanged between two users in chronological order.
 
         Requires user to be logged-in,
         users can only view messages they sent or received
@@ -295,7 +295,7 @@ class UserService:
         return self.__message_repository.get_messages(user_a, user_b)
 
     def _check_if_logged_in(self, user: User) -> None:
-        """Raise exception if given user is not currently logged in
+        """Raise exception if given user is not currently logged in.
 
         :raises UnauthorizedError: if user is not logged-in
         """
@@ -307,27 +307,37 @@ class UserService:
 
 
 class RegistrationException(Exception):
+    """Generic problem with registration process."""
+
     pass
 
 
 class UsernameTakenException(RegistrationException):
+    """Username is already taken."""
+
     def __init__(self, username):
         super().__init__("Username is already taken by someone else")
         self.username = username
 
 
 class EmailAlreadyUsedException(RegistrationException):
+    """Email is used by another user."""
+
     def __init__(self, email):
         super().__init__("There already exists a user with this email address")
         self.email = email
 
 
 class WeakPasswordException(RegistrationException):
+    """Password is too weak."""
+
     def __init__(self):
         super().__init__("Password is too weak")
 
 
 class AlreadyFriendsException(Exception):
+    """Users are already friends."""
+
     def __init__(self, user_1, user_2):
         super().__init__("Users are already friends")
         self.user_1 = user_1

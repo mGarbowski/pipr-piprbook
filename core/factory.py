@@ -1,4 +1,4 @@
-"""Utilities for creating class instances with their dependencies"""
+"""Utilities for creating class instances with their dependencies."""
 
 from typing import TextIO
 
@@ -16,7 +16,7 @@ from persistence.repositories import (
 
 
 def get_user_service_default(database_file: TextIO) -> UserService:
-    """Facotry for UserService, connected to database in given file
+    """Create UserService connected to database in given file.
 
     Creating all dependencies, sharing class instances.
     Expecting default collections - users, messages, friend_requests, photos

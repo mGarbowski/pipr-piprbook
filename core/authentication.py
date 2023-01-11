@@ -1,4 +1,4 @@
-"""User authentication and authorization, salting and hashing utilities"""
+"""User authentication and authorization, salting and hashing utilities."""
 
 from copy import deepcopy
 from hashlib import sha256
@@ -12,7 +12,7 @@ from persistence.repositories import UserRepository
 
 
 class Authentication:
-    """Class for managing user authentication
+    """Class for managing user authentication.
 
     Stores currently logged-in user.
     Handles logging in and out.
@@ -20,7 +20,7 @@ class Authentication:
     """
 
     def __init__(self, user_repository: UserRepository):
-        """Create a new Authentication object, initially no user is logged in
+        """Create a new Authentication object, initially no user is logged in.
 
         :param user_repository: UserRepository to get user credentials from
         """
@@ -29,7 +29,7 @@ class Authentication:
 
     # TODO: secure aggainst timing attack
     def log_in(self, login: str, password: str) -> None:
-        """Attempt to log in with given credentials
+        """Attempt to log in with given credentials.
 
         Logs out previously logged-in user if there was any.
         Raises exception on failed log-in attempt
@@ -50,12 +50,12 @@ class Authentication:
             raise IncorrectPasswordError()
 
     def log_out(self) -> None:
-        """Log out currently logged-in user if there is any"""
+        """Log out currently logged-in user if there is any."""
         self.__logged_in_user = None
 
     @property
     def logged_in_user(self) -> Optional[User]:
-        """Return a deep copy of currently logged-in user
+        """Return a deep copy of currently logged-in user.
 
         Copying to prevent from mutating the user externally - avoid
             security vulnerability
@@ -64,7 +64,7 @@ class Authentication:
 
 
 def hash_password(password: str, salt: str) -> str:
-    """Hash password with salt using SHA256 algorithm with UTF-8 encoding
+    """Hash password with salt using SHA256 algorithm with UTF-8 encoding.
 
     :param password: user's password
     :param salt: random string concatenated to the password before hashing
@@ -77,17 +77,18 @@ def hash_password(password: str, salt: str) -> str:
 
 
 def generate_salt() -> str:
-    """Generate a random string of ascii letters"""
+    """Generate a random string of ascii letters."""
     return "".join(choices(ascii_letters, k=SALT_LENGTH))
 
 
 class LoginFailedError(Exception):
-    """Generic exception signaling that a log-in attempt failed"""
+    """Generic exception signaling that a log-in attempt failed."""
+
     pass
 
 
 class UserDoesNotExistError(LoginFailedError):
-    """Exception signaling that there is no user with given login/username"""
+    """Exception signaling that there is no user with given login/username."""
 
     def __init__(self, username):
         super().__init__(f"User: {username} does not exist")
@@ -95,12 +96,13 @@ class UserDoesNotExistError(LoginFailedError):
 
 
 class IncorrectPasswordError(LoginFailedError):
-    """Exception singaling that given password is incorrect"""
+    """Exception singaling that given password is incorrect."""
 
     def __init__(self):
         super().__init__("Incorrect password")
 
 
 class UnauthorizedError(Exception):
-    """Exception signaling that user is unauthorized to perform action"""
+    """Exception signaling that user is unauthorized to perform action."""
+
     pass

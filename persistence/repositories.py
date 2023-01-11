@@ -1,4 +1,4 @@
-"""Repository classes for accessing data persisted in a Database"""
+"""Repository classes for accessing data persisted in a Database."""
 from abc import ABC
 from typing import Optional, List, TypeVar, Generic
 
@@ -9,13 +9,15 @@ T = TypeVar("T", bound=Entity)
 
 
 class BaseRepository(ABC, Generic[T]):
+    """Generic abstract base class for database operations on entities."""
+
     def __init__(
             self,
             database: Database,
             serializer: JsonSerializer,
             collection_name: str
     ):
-        """Create a Repository connected to the given database
+        """Create a Repository connected to the given database.
 
         :param database: database to persist entities in
         :param serializer: JSON serializer for entities
@@ -26,7 +28,7 @@ class BaseRepository(ABC, Generic[T]):
         self._collection_name = collection_name
 
     def save(self, entity: T):
-        """Create new entity or update existing one
+        """Create new entity or update existing one.
 
         :param entity: entity to create or update
         """
@@ -34,7 +36,7 @@ class BaseRepository(ABC, Generic[T]):
         self._database.save(entity_dict, self._collection_name)
 
     def get_by_id(self, entity_id: str) -> Optional[T]:
-        """Get entity by id or None if it does not exist
+        """Get entity by id or None if it does not exist.
 
         :param entity_id: id of searched entity
         """
@@ -45,7 +47,7 @@ class BaseRepository(ABC, Generic[T]):
         return self._serializer.from_json(entity_dict) if entity_dict else None
 
     def delete(self, entity: T):
-        """Delete entity or do nothing if it does not exist in the database
+        """Delete entity or do nothing if it does not exist in the database.
 
         :param entity: entity to delete
         """
@@ -53,7 +55,7 @@ class BaseRepository(ABC, Generic[T]):
 
 
 class UserRepository(BaseRepository[User]):
-    """Class for accessing users stored in a database"""
+    """Class for accessing users stored in a database."""
 
     def __init__(
             self,
@@ -61,7 +63,7 @@ class UserRepository(BaseRepository[User]):
             serializer: JsonSerializer[User],
             collection_name: str = "users"
     ):
-        """Create UserRepository connected to the given database
+        """Create UserRepository connected to the given database.
 
         :param database: database object to persist users in
         :param serializer: JSON serializer for users
@@ -71,14 +73,14 @@ class UserRepository(BaseRepository[User]):
         super().__init__(database, serializer, collection_name)
 
     def get_all(self) -> List[User]:
-        """Get all users"""
+        """Get all users."""
         users_json = self._database.get_collection(self._collection_name)
         users = [self._serializer.from_json(user_json) for user_json in
                  users_json]
         return users
 
     def get_by_username(self, username: str) -> Optional[User]:
-        """Get user by username or None if not found
+        """Get user by username or None if not found.
 
         :param username: username matched exactly to a user
         """
@@ -87,7 +89,7 @@ class UserRepository(BaseRepository[User]):
         return users[0] if users else None
 
     def get_by_email(self, email: str) -> Optional[User]:
-        """Get user by email or None if not found
+        """Get user by email or None if not found.
 
         If email is not unique, may return any matching user instance
 
@@ -98,7 +100,7 @@ class UserRepository(BaseRepository[User]):
         return users[0] if users else None
 
     def get_by_username_fragment(self, username_fragment: str) -> List[User]:
-        """Get all users with username matching fragment
+        """Get all users with username matching fragment.
 
         :param username_fragment: string contained in user's username
         """
@@ -109,7 +111,7 @@ class UserRepository(BaseRepository[User]):
 
 
 class MessageRepository(BaseRepository[Message]):
-    """Class for accessing messages persisted in a database"""
+    """Class for accessing messages persisted in a database."""
 
     def __init__(
             self,
@@ -117,7 +119,7 @@ class MessageRepository(BaseRepository[Message]):
             serializer: JsonSerializer[Message],
             collection_name: str = "messages"
     ):
-        """Create a message repository connected to the given database
+        """Create a message repository connected to the given database.
 
         :param database: database object to persist messages in
         :param serializer: JSON serializer for messages
@@ -127,7 +129,7 @@ class MessageRepository(BaseRepository[Message]):
         super().__init__(database, serializer, collection_name)
 
     def get_messages(self, user_a: User, user_b: User) -> List[Message]:
-        """Get all messages exchanged between two users, ordered by timestamp
+        """Get all messages exchanged between two users, ordered by timestamp.
 
         Earlier messages first
         Order of users does not matter
@@ -149,13 +151,13 @@ class MessageRepository(BaseRepository[Message]):
 
 
 def _is_message_matched(message: Message, user_a: User, user_b: User) -> bool:
-    """Return whether message was sent from one of given users to the other"""
+    """Return whether message was sent from one of given users to the other."""
     user_ids = (user_a.uuid, user_b.uuid)
     return message.to_user_id in user_ids and message.from_user_id in user_ids
 
 
 class FriendRequestRepository(BaseRepository[FriendRequest]):
-    """Class for accessing friend requests stored in a database"""
+    """Class for accessing friend requests stored in a database."""
 
     def __init__(
             self,
@@ -163,7 +165,7 @@ class FriendRequestRepository(BaseRepository[FriendRequest]):
             serializer: JsonSerializer[FriendRequest],
             collection_name: str = "friend_requests"
     ):
-        """Create FriendRequestRepository connected to the given database
+        """Create FriendRequestRepository connected to the given database.
 
         :param database: database to persist friend requests in
         :param serializer: JSON serializer for friend requests
@@ -173,7 +175,7 @@ class FriendRequestRepository(BaseRepository[FriendRequest]):
         super().__init__(database, serializer, collection_name)
 
     def get_requests_to_user(self, to_user: User) -> List[FriendRequest]:
-        """Get all requests sent to given user, ordered by timestamp
+        """Get all requests sent to given user, ordered by timestamp.
 
         :param to_user: user receiving friend requests
         """
@@ -183,7 +185,7 @@ class FriendRequestRepository(BaseRepository[FriendRequest]):
         return requests
 
     def get_requests_from_user(self, from_user: User) -> List[FriendRequest]:
-        """Get all requests sent by the given user, ordered by timestamp
+        """Get all requests sent by the given user, ordered by timestamp.
 
         :param from_user: user sending friend requests
         """
@@ -196,7 +198,7 @@ class FriendRequestRepository(BaseRepository[FriendRequest]):
         return requests
 
     def _get_all_requests(self) -> List[FriendRequest]:
-        """Get all friend requests from the database"""
+        """Get all friend requests from the database."""
         requests_json = self._database.get_collection(self._collection_name)
         return [
             self._serializer.from_json(req_json)
@@ -205,7 +207,7 @@ class FriendRequestRepository(BaseRepository[FriendRequest]):
 
 
 class PhotoRepository(BaseRepository[Photo]):
-    """Class for accessing photos stored in a database"""
+    """Class for accessing photos stored in a database."""
 
     def __init__(
             self,
@@ -213,7 +215,7 @@ class PhotoRepository(BaseRepository[Photo]):
             serializer: JsonSerializer,
             collection_name: str = "photos"
     ):
-        """Create PhotoRepository connected to the given database
+        """Create PhotoRepository connected to the given database.
 
         :param database: database to persist photos in
         :param serializer: JSON serializer for photos
