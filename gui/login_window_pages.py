@@ -5,7 +5,8 @@ from typing import Callable
 from PySide2.QtWidgets import QWidget
 
 from core.user_service import (
-    UserService, UsernameTakenException, EmailAlreadyUsedException
+    UserService, UsernameTakenException,
+    EmailAlreadyUsedException, WeakPasswordException
 )
 from core.validation import IncorrectUsernameError, IncorrectEmailError
 from gui.ui_components.ui_login_page import Ui_LoginPage
@@ -128,3 +129,5 @@ class RegisterPage(QWidget):
             self._show_message("Username must be at least 4 characters long")
         except IncorrectEmailError:
             self._show_message("Incorrect email address")
+        except WeakPasswordException as e:
+            self._show_message(str(e))

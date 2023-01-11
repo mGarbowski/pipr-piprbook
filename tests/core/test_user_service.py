@@ -5,7 +5,7 @@ from unittest.mock import MagicMock
 from pytest import fixture, raises
 
 from core.authentication import LoginFailedError, UnauthorizedError
-from core.user_service import UserService, UsernameTakenException, EmailAlreadyUsedException
+from core.user_service import UserService, UsernameTakenException, EmailAlreadyUsedException, WeakPasswordException
 from core.model import FriendRequest
 
 
@@ -111,7 +111,7 @@ class TestUserService:
         user_repository.get_by_username_fragment.assert_called_once_with("fragment")
 
     def test_register_new_user(self, user_service, user_repository):
-        user_service.register_new_user("user2", "user2@example.com", "user2")
+        user_service.register_new_user("user2", "user2@example.com", "safepa$$worD123")
         user_repository.save.assert_called_once()
 
     def test_register_new_user_username_taken(self, user_service, user_1):
@@ -121,6 +121,10 @@ class TestUserService:
     def test_register_new_user_email_taken(self, user_service, user_1):
         with raises(EmailAlreadyUsedException):
             user_service.register_new_user("new username", user_1.email, "newpassword")
+
+    def test_register_new_user_weak_password(self, user_service):
+        with raises(WeakPasswordException):
+            user_service.register_new_user("new username", "newmail@example.com", "weak")
 
     def test_set_bio(self, user_service, user_repository, user_1):
         user_service.log_in_user(user_1.username, "password")

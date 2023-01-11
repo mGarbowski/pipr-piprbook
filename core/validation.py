@@ -1,7 +1,13 @@
 """Utilities for parameter validation and appropriate exceptions."""
 
 import re
-from string import ascii_letters, ascii_lowercase, ascii_uppercase, punctuation, digits
+from string import (
+    ascii_letters,
+    ascii_lowercase,
+    ascii_uppercase,
+    punctuation,
+    digits
+)
 
 SALT_LENGTH = 10
 
@@ -34,7 +40,6 @@ def is_weak_password(password: str) -> bool:
         - contain a digit
         - containg a special character
     """
-
     if len(password) < 8:
         return True
     if not any(lower in password for lower in ascii_lowercase):

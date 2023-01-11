@@ -7,6 +7,7 @@ from core.authentication import Authentication, UnauthorizedError, \
     LoginFailedError, hash_password, generate_salt
 from core.identifiers import generate_uuid
 from core.model import FriendRequest, Message, User, Photo
+from core.validation import is_weak_password
 from persistence.repositories import (
     FriendRequestRepository, MessageRepository, PhotoRepository, UserRepository
 )
@@ -91,7 +92,8 @@ class UserService:
             raise UsernameTakenException(username)
         if self.__user_repository.get_by_email(email) is not None:
             raise EmailAlreadyUsedException(email)
-        # TODO: validate weak password
+        if is_weak_password(password):
+            raise WeakPasswordException()
 
         salt = generate_salt()
         user = User(
@@ -332,7 +334,8 @@ class WeakPasswordException(RegistrationException):
     """Password is too weak."""
 
     def __init__(self):
-        super().__init__("Password is too weak")
+        super().__init__("Password must be at least 8 characters word, "
+                         "contain mixed case, digits and special characters")
 
 
 class AlreadyFriendsException(Exception):
