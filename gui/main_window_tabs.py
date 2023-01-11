@@ -2,7 +2,7 @@
 
 from PySide2.QtCore import QByteArray
 from PySide2.QtGui import QPixmap
-from PySide2.QtWidgets import QWidget, QFileDialog, QListWidgetItem
+from PySide2.QtWidgets import QWidget, QFileDialog, QListWidgetItem, QErrorMessage, QMessageBox
 
 from core.model import Photo
 from core.user_service import UserService
@@ -10,6 +10,7 @@ from gui.resources.resources import get_placeholder_picture
 from gui.ui_components.ui_invite_friends_page import Ui_InviteFriendsPage
 from gui.ui_components.ui_messenger_page import Ui_MessengerPage
 from gui.ui_components.ui_profile_page import Ui_ProfilePage
+from core.validation import UnsupportedFileFormatError
 
 
 class ProfilePage(QWidget):
@@ -60,9 +61,12 @@ class ProfilePage(QWidget):
         if not file_path:  # No file was selected
             return
 
-        # TODO: validate file, handle errors
-        with open(file_path, mode="rb") as file_handle:
-            profile_picture = Photo.from_file(file_handle, file_path)
+        try:
+            with open(file_path, mode="rb") as file_handle:
+                profile_picture = Photo.from_file(file_handle, file_path)
+        except UnsupportedFileFormatError as e:
+            QMessageBox.critical(self, "Unsupported format", f"Unsupported file format: {e.file_format}")
+            return
 
         user = self.user_service.get_current_user()
         previous_profile_picture = self.user_service.get_profile_picture(user)
