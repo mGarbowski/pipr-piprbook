@@ -38,9 +38,10 @@ class TestIsPasswordWeak:
         assert is_weak_password("useruser./1^")
         assert is_weak_password("USERUSERUSER./1^")
         assert is_weak_password("USERUSE123./1^")
+        assert is_weak_password("useR%$1")
 
     def test_id_not_weak(self):
-        assert not is_weak_password("useR%$1234")
+        assert not is_weak_password("useR%$12")
         assert not is_weak_password("Pa$$word8123")
 
 
